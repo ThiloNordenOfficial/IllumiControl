@@ -1,0 +1,32 @@
+{
+  "universes": [
+    {
+      "id": "1",
+      "fixtures": [
+        {
+          "id": "1",
+          "type": "PAR",
+          "dmx_addresses": [
+            {
+              "channel": 1,
+              "channel_type": "COLOR_RED"
+            },
+            {
+              "channel": 2,
+              "channel_type": "COLOR_GREEN"
+            },
+            {
+              "channel": 3,
+              "channel_type": "COLOR_BLUE"
+            }
+          ],
+          "position": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    }
+  ]
+}
