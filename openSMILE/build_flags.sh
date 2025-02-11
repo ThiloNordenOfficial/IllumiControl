@@ -46,7 +46,7 @@ cmake_flags=(
     -DWITH_FFMPEG=OFF
 
     # whether to compile with OpenCV support
-    -DWITH_OPENCV=ON
+    -DWITH_OPENCV=OFF
 
     # whether to compile with OpenSL ES support (only applies when building for Android)
     -DWITH_OPENSLES=OFF
