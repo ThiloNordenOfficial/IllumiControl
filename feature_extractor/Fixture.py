@@ -1,8 +1,8 @@
-import logging
 from typing import Tuple, TypeGuard, List
 
-from DmxChannelType import DmxChannelType
-from FixtureType import FixtureType
+from feature_extractor.FixtureType import FixtureType
+from feature_extractor.DmxChannelType import DmxChannelType
+
 
 class Fixture:
     def __init__(self, fixture_id: int, fixture_type: str, dmx_universe: int,
@@ -20,11 +20,13 @@ class Fixture:
     def __repr__(self):
         return self.__str__()
 
+
 def verify_initialization_data(fixture_type, dmx_universe, dmx_addresses, position):
     verify_fixture_type(fixture_type)
     verify_universe(dmx_universe)
     verify_dmx_address(dmx_addresses)
     verify_position(position)
+
 
 def verify_dmx_address(dmx_address):
     # check if the dmx address is in the correct range
@@ -43,6 +45,7 @@ def verify_dmx_address(dmx_address):
     # check if all ChannelTypes are valid
     for address in dmx_address:
         verify_dmx_channel_type(address[1])
+
 
 def verify_dmx_channel_type(channel_type) -> TypeGuard[DmxChannelType]:
     try:

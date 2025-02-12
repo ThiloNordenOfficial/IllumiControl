@@ -1,12 +1,9 @@
 import math
-
 import opensmile
 import pyaudio
 import numpy as np
 import time
 
-def __init__(self):
-    pass
 
 def main(chunk_size, analyse_duration) -> (float, int):
     CHUNKSIZE = chunk_size  # fixed chunk size
@@ -28,8 +25,9 @@ def main(chunk_size, analyse_duration) -> (float, int):
                     input_device_index=DEVICE_INDEX)
 
     smile = opensmile.Smile(
-        feature_set=opensmile.FeatureSet.eGeMAPSv01b,
-        multiprocessing=True
+        feature_set="./configs/compare/ComParE_2016.conf",
+        multiprocessing=True,
+        num_workers=4
     )
     print(smile.feature_names)
     amount_parameters = len(smile.feature_names)
