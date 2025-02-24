@@ -5,7 +5,7 @@ import numpy as np
 import time
 
 
-def main(chunk_size, analyse_duration) -> (float, int):
+def main(chunk_size, analyse_duration) -> (float, int, list):
     CHUNKSIZE = chunk_size  # fixed chunk size
     DEVICE_INDEX = 5
 
@@ -23,33 +23,33 @@ def main(chunk_size, analyse_duration) -> (float, int):
 
     stream = p.open(format=pyaudio.paInt16, channels=1, rate=sampling_rate, input=True, frames_per_buffer=CHUNKSIZE,
                     input_device_index=DEVICE_INDEX)
-
+    print(sampling_rate, chunk_size, DEVICE_INDEX)
     smile = opensmile.Smile(
         feature_set="./configs/compare/ComParE_2016.conf",
         multiprocessing=True,
         num_workers=4
     )
-    print(smile.feature_names)
     amount_parameters = len(smile.feature_names)
     t_end = time.time() + analyse_duration  # Run for 5 seconds
     calc_durations = []
 
     # do this as long as you want fresh samples
+    shapes = []
     while time.time() < t_end:
         stream_data = stream.read(CHUNKSIZE)
         numpydata = np.frombuffer(stream_data, dtype=np.int16)
         start_time = time.time()
-        calculated_data = smile.process_signal(
+        shapes.append(smile.process_signal(
             numpydata,
             sampling_rate
-        )
+        ).to_numpy().shape)
         calc_durations.append(time.time() - start_time)
 
     # close stream
     stream.stop_stream()
     stream.close()
     p.terminate()
-    return sum(calc_durations) / len(calc_durations), amount_parameters
+    return sum(calc_durations) / len(calc_durations), amount_parameters, shapes
 
 
 if __name__ == "__main__":
@@ -65,4 +65,4 @@ if __name__ == "__main__":
     #
     # for runtime in runtimes:
     #     print(runtime)
-    main(8192, 30)
+    print(main(16384, 30))

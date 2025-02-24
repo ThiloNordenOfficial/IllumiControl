@@ -1,4 +1,3 @@
-
 class DmxConverter:
     def __init__(self):
         self.dmx = pydmx.DMXConnection('/dev/ttyUSB0')

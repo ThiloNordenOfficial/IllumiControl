@@ -1,0 +1,5 @@
+numpy~=1.26.4
+coloredlogs~=15.0.1
+pyaudio~=0.2.13
+opensmile~=2.5.1
+pandas~=2.2.3
