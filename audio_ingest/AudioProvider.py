@@ -4,9 +4,24 @@ import math
 import pyaudio
 
 
+# {
+#     'index': 5,
+#     'structVersion': 2,
+#     'name': 'GENERAL WEBCAM: USB Audio (hw:1,0)',
+#     'hostApi': 0,
+#     'maxInputChannels': 1,
+#     'maxOutputChannels': 0,
+#     'defaultLowInputLatency': 0.0239375,
+#     'defaultLowOutputLatency': -1.0,
+#     'defaultHighInputLatency': 0.096,
+#     'defaultHighOutputLatency': -1.0,
+#     'defaultSampleRate': 16000.0
+# }
+
+
 class AudioProvider:
     p = pyaudio.PyAudio()
-    DEFAULT_CHUNK_SIZE = 16384
+    DEFAULT_CHUNK_SIZE = 10000000
     DEFAULT_CHANNELS = 1
     DEFAULT_DTYPE = pyaudio.paInt16
 
@@ -32,7 +47,8 @@ class AudioProvider:
             rate=self.sample_rate,
             input=True,
             frames_per_buffer=self.chunk_size,
-            input_device_index=self.device_index)
+            input_device_index=self.device_index
+        )
 
     @staticmethod
     def list_devices():

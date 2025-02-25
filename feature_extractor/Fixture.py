@@ -8,11 +8,12 @@ class Fixture:
     def __init__(self, fixture_id: int, fixture_type: str, dmx_universe: int,
                  dmx_addresses: List[Tuple[int, str]], position: Tuple[int, int, int]):
         verify_initialization_data(fixture_type, dmx_universe, dmx_addresses, position)
-        self.fixture_id = fixture_id
+        self.fixture_id: int = fixture_id
         self.type: FixtureType = FixtureType(fixture_type)
-        self.dmx_universe = dmx_universe
-        self.dmx_addresses: [Tuple[int, DmxChannelType]] = [(addr, DmxChannelType(ch_type)) for addr, ch_type in dmx_addresses]
-        self.position = position
+        self.dmx_universe: int = dmx_universe
+        self.dmx_addresses: [Tuple[int, DmxChannelType]] = [(addr, DmxChannelType(ch_type)) for addr, ch_type in
+                                                            dmx_addresses]
+        self.position: Tuple[int, int, int] = position
 
     def __str__(self):
         return f"Fixture Id: {self.fixture_id}, Type: {self.type}, Universe: {self.dmx_universe}, Addresses: {self.dmx_addresses}, Position: {self.position}"
@@ -69,7 +70,7 @@ def verify_position(position):
     for i in position:
         if not isinstance(i, int):
             raise ValueError("Position must be a 3-tuple of integers")
-        if i < 0 :
+        if i < 0:
             raise ValueError("Position must be positive integers")
 
 

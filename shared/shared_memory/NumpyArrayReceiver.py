@@ -1,5 +1,5 @@
 import numpy as np
-from multiprocessing import shared_memory, Condition
+from multiprocessing import shared_memory
 from shared.shared_memory import NumpyArraySender
 
 
@@ -8,6 +8,7 @@ class NumpyArrayReceiver:
     DataReceiver connects to the shared memory block created by DataSender and waits
     for updates using a shared Condition. When an update occurs, it returns the updated array.
     """
+
     def __init__(self, nps: NumpyArraySender):
         self.shape = nps.shape
         self.dtype = np.dtype(nps.dtype)
@@ -23,7 +24,7 @@ class NumpyArrayReceiver:
         self.last_version = self.version_array[0]
         self.condition = nps.condition
 
-    def read_on_update(self):
+    def read_on_update(self) -> np.ndarray:
         """
         Blocks until an update from DataSender occurs (i.e., the version number changes),
         then returns a copy of the updated array.

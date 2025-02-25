@@ -18,12 +18,11 @@ if __name__ == "__main__":
     while time.time() < t_end:
         start_time = time.time()
         stream_data = ap.stream.read(1048576)
-        numpydata = np.frombuffer(stream_data, dtype=np.int16)
         print(f"Time to read stream data: {time.time() - start_time}")
         start_time = time.time()
         data = smile.process_signal(
             np.frombuffer(
-                numpydata,
+                np.frombuffer(stream_data),
                 dtype=np.int16
             ),
             ap.sample_rate

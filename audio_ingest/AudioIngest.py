@@ -1,6 +1,5 @@
 import argparse
 import logging
-import time
 
 import numpy as np
 import opensmile
@@ -28,13 +27,13 @@ class AudioIngest(CommandLineArgumentAdder):
             feature_set=args.feature_set,
             feature_level=FeatureLevel.Functionals
         )
-        self.audio_stream = self.audio_provider.stream
         self.audio_data_sender = NumpyArraySender(np.shape(self.digest()))
         logging.debug("Audio ingest initialized")
 
     def digest(self) -> np.ndarray:
         return self.smile.process_signal(
             np.frombuffer(
+                # TODO WHHHHHYYY IS IT NOT LOCKING?!?!?!??!?!?!?!
                 self.audio_provider.stream.read(self.audio_provider.chunk_size),
                 dtype=np.int16
             ),
@@ -49,7 +48,8 @@ class AudioIngest(CommandLineArgumentAdder):
 
     @staticmethod
     def add_command_line_arguments(parser: argparse) -> argparse:
-        parser.add_argument("--list-audio-devices", dest='list_audio_devices', action='store_const')
+        parser.add_argument("--list-audio-devices", dest='list_audio_devices',
+                            help="List all available audio devices and exit")
         parser.add_argument("--audio-device", dest='audio_device', required=True, type=int,
                             help="Device index of the audio input device")
         parser.add_argument("--sample-rate", dest='sample_rate', type=int,
@@ -74,5 +74,6 @@ if __name__ == "__main__":
 
     LoggingConfigurator(args)
     audio_ingest = AudioIngest(args)
-    logging.debug(F"Parameters: {audio_ingest.audio_data_sender.name}, {audio_ingest.audio_data_sender.shape}, {audio_ingest.audio_data_sender.dtype}")
+    logging.debug(
+        F"Parameters: {audio_ingest.audio_data_sender}")
     audio_ingest.run()

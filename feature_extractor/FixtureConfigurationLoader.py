@@ -32,4 +32,5 @@ class FixtureConfigurationLoader:
                     Fixture(config_fixture['id'], config_fixture['type'], config_universe['id'],
                             fixture_addresses, tuple[int, int, int]((config_fixture['position'])))
                 )
+        logging.debug(f"Loaded {len(fixtures)} fixtures")
         return fixtures

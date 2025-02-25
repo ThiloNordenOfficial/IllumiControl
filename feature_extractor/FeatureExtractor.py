@@ -1,19 +1,34 @@
 import argparse
 import logging
 import pickle
+import time
 
 from CommandLineArgumentAdder import CommandLineArgumentAdder
 from feature_extractor.FixtureConfigurationLoader import FixtureConfigurationLoader
 from shared import is_valid_file, LoggingConfigurator
+from shared.shared_memory import NumpyArraySender
+from shared.shared_memory.NumpyArrayReceiver import NumpyArrayReceiver
 
 
 class FeatureExtractor(CommandLineArgumentAdder):
-    def __init__(self, args: argparse.Namespace):
-        fixtures = FixtureConfigurationLoader(args.fixture_config).fixtures
-        image = pickle.load(open(args.input, "rb"))
-        for fixture in fixtures:
-            logging.debug(fixture)
-            logging.debug(image[fixture.position[0], fixture.position[1], :])
+    def __init__(self, args: argparse.Namespace, image_data_sender: NumpyArraySender):
+        self.fixtures = FixtureConfigurationLoader(args.fixture_config).fixtures
+        self.image_data_receiver = NumpyArrayReceiver(image_data_sender)
+        logging.debug("Initializing feature extractor")
+
+    def run(self):
+        logging.debug("Starting feature extractor run loop")
+        while True:
+            image = self.image_data_receiver.read_on_update()
+            logging.debug("Received image data")
+            # TODO think about more complex extraction methods than just reading the pixel values
+            # multiprocessing to parallelize the extraction of features might be feasible
+            for fixture in self.fixtures:
+                self.extract_dmx_values(fixture, image)
+
+    def extract_dmx_values(self, fixture, image):
+        rgb_value = image[fixture.position[0], fixture.position[1], fixture.position[2]]
+        logging.debug(f"Fixture {fixture.type} at position {fixture.position} has RGB value {rgb_value}")
 
     @staticmethod
     def add_command_line_arguments(parser: argparse) -> argparse:

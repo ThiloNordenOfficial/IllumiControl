@@ -1,11 +1,6 @@
 import argparse
-import concurrent.futures
-import logging
-import multiprocessing
-import sys
 import threading
 from concurrent.futures import Future, ThreadPoolExecutor
-
 from CommandLineArgumentAdder import CommandLineArgumentAdder
 from audio_ingest import AudioIngest
 from feature_extractor import FeatureExtractor
@@ -25,10 +20,18 @@ if __name__ == "__main__":
     LoggingConfigurator(cmdl_args)
     audio_ingest = AudioIngest(cmdl_args)
     image_generator = ImageGenerator(cmdl_args, audio_ingest.audio_data_sender)
+    feature_extractor = FeatureExtractor(cmdl_args, image_generator.image_data_sender)
 
-    with ThreadPoolExecutor(max_workers=2) as executor:
-        ingest_runner: Future = executor.submit(audio_ingest.run)
-        image_runner: Future = executor.submit(image_generator.run)
+    ingest_runner = threading.Thread(target=audio_ingest.run)
+    image_runner = threading.Thread(target=image_generator.run)
+    feature_runner = threading.Thread(target=feature_extractor.run)
+
+    threads = [ingest_runner, image_runner, feature_runner]
+    for thread in threads:
+        thread.start()
+
+    for thread in threads:
+        thread.join()
 
     # FeatureExtractor(cmdl_args)
     # parallelization
