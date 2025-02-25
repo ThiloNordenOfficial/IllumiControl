@@ -1,15 +1,15 @@
 import argparse
 import logging
+import time
 
 import numpy as np
 import opensmile
-import time
 from opensmile import FeatureLevel
 
-from audio_ingest.AudioDataSender import AudioDataSender
 from audio_ingest.AudioProvider import AudioProvider
 from CommandLineArgumentAdder import CommandLineArgumentAdder
 from shared import LoggingConfigurator, is_valid_file
+from shared.shared_memory.NumpyArraySender import NumpyArraySender
 
 
 class AudioIngest(CommandLineArgumentAdder):
@@ -29,7 +29,7 @@ class AudioIngest(CommandLineArgumentAdder):
             feature_level=FeatureLevel.Functionals
         )
         self.audio_stream = self.audio_provider.stream
-        self.audio_data_sender = AudioDataSender(np.shape(self.digest()))
+        self.audio_data_sender = NumpyArraySender(np.shape(self.digest()))
         logging.debug("Audio ingest initialized")
 
     def digest(self) -> np.ndarray:
@@ -44,9 +44,8 @@ class AudioIngest(CommandLineArgumentAdder):
     def run(self):
         logging.debug("Starting audio ingest run loop")
         while True:
-            self.audio_data_sender.update_data(self.digest())
-            #TODO REMOVE THIS
-            time.sleep(0.05)
+            self.audio_data_sender.update(self.digest())
+            logging.debug("Updated audio data")
 
     @staticmethod
     def add_command_line_arguments(parser: argparse) -> argparse:

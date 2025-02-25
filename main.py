@@ -4,7 +4,7 @@ import logging
 import multiprocessing
 import sys
 import threading
-from concurrent.futures import Future
+from concurrent.futures import Future, ThreadPoolExecutor
 
 from CommandLineArgumentAdder import CommandLineArgumentAdder
 from audio_ingest import AudioIngest
@@ -24,17 +24,16 @@ if __name__ == "__main__":
 
     LoggingConfigurator(cmdl_args)
     audio_ingest = AudioIngest(cmdl_args)
-    image_generator = ImageGenerator(cmdl_args, audio_ingest.audio_data_sender.name,
-                                     audio_ingest.audio_data_sender.shape, audio_ingest.audio_data_sender.dtype)
+    image_generator = ImageGenerator(cmdl_args, audio_ingest.audio_data_sender)
 
-    with concurrent.futures.ThreadPoolExecutor() as executor:
+    with ThreadPoolExecutor(max_workers=2) as executor:
         ingest_runner: Future = executor.submit(audio_ingest.run)
         image_runner: Future = executor.submit(image_generator.run)
 
     # FeatureExtractor(cmdl_args)
     # parallelization
-#### Multithreading (Audio receiver) with multiprocessing (parralalizing task of thread)
-# Optimization possible by aborting stable diffusion if taking longer than max calc time (param)
-# Compacting data structure by combining 3 values into 1
-#           e.g r 255 g 255 b 255 -> r >> shift, g >> shift, b >> shift
-#           or r 255 g 255 b 255 -> 255255255
+    #### Multithreading (Audio receiver) with multiprocessing (parralalizing task of thread)
+    # Optimization possible by aborting stable diffusion if taking longer than max calc time (param)
+    # Compacting data structure by combining 3 values into 1
+    #           e.g r 255 g 255 b 255 -> r >> shift, g >> shift, b >> shift
+    #           or r 255 g 255 b 255 -> 255255255
