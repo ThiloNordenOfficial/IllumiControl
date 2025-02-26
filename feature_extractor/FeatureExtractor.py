@@ -35,7 +35,7 @@ class FeatureExtractor(CommandLineArgumentAdder):
         parser.add_argument("-fc", "--fixture-config", dest='fixture_config', required=True,
                             type=lambda x: is_valid_file(parser, x), help="Path to the fixture configuration file")
         # TODO For dev purposes, till the image is generated
-        parser.add_argument("-i", "--input", dest='input', required=True, type=lambda x: is_valid_file(parser, x),
+        parser.add_argument("-i", "--input", dest='input_image', required=True, type=lambda x: is_valid_file(parser, x),
                             help="Path to the debug image")
 
     add_command_line_arguments = staticmethod(add_command_line_arguments)

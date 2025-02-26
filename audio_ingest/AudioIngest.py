@@ -33,9 +33,8 @@ class AudioIngest(CommandLineArgumentAdder):
     def digest(self) -> np.ndarray:
         return self.smile.process_signal(
             np.frombuffer(
-                # TODO WHHHHHYYY IS IT NOT LOCKING?!?!?!??!?!?!?!
-                self.audio_provider.stream.read(self.audio_provider.chunk_size),
-                dtype=np.int16
+                self.audio_provider.get_next_bytes_of_stream(),
+                dtype=np.int32
             ),
             self.audio_provider.sample_rate
         ).to_numpy()
@@ -50,7 +49,7 @@ class AudioIngest(CommandLineArgumentAdder):
     def add_command_line_arguments(parser: argparse) -> argparse:
         parser.add_argument("--list-audio-devices", dest='list_audio_devices',
                             help="List all available audio devices and exit")
-        parser.add_argument("--audio-device", dest='audio_device', required=True, type=int,
+        parser.add_argument("--audio-device", dest='audio_device', type=int,
                             help="Device index of the audio input device")
         parser.add_argument("--sample-rate", dest='sample_rate', type=int,
                             help="Desired sample rate of the audio input device, if not provided the default sample rate of the device will be used")
@@ -66,7 +65,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         prog='Audio Ingest',
         description='')
-
     AudioIngest.add_command_line_arguments(parser)
     LoggingConfigurator.add_command_line_arguments(parser)
 

@@ -1,19 +1,27 @@
 import argparse
 import threading
-from concurrent.futures import Future, ThreadPoolExecutor
 from CommandLineArgumentAdder import CommandLineArgumentAdder
 from audio_ingest import AudioIngest
 from feature_extractor import FeatureExtractor
 from image_generator import ImageGenerator
-from shared import LoggingConfigurator
+from shared import LoggingConfigurator, ConfigReader
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         prog='IllumiControl',
         description='')
 
+    # If a run-config file is provided, the arguments in the file will be used
+    ConfigReader.add_command_line_arguments(parser)
+    # If the users wants to pass their own path to the config file, the argument have to be evaluated
+    config_arg = parser.parse_args()
+
+    # To set the arguments of other modules, they have to be known first
     for argument_adder in CommandLineArgumentAdder.__subclasses__():
         argument_adder.add_command_line_arguments(parser)
+
+    # The config file is read, if provided, and the arguments are updated
+    ConfigReader(config_arg, parser)
 
     cmdl_args = parser.parse_args()
 

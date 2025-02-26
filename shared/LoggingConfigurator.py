@@ -15,12 +15,10 @@ class LoggingConfigurator(CommandLineArgumentAdder):
             3: logging.INFO,
             4: logging.DEBUG,
         }
-
-        log_level = log_levels[min(args.verbosity, max(log_levels.keys()))]
+        log_level = log_levels[min(int(args.verbosity), max(log_levels.keys()))]
         coloredlogs.install(level=log_level,
                             fmt="%(asctime)s %(name)s[%(process)d] %(levelname)s {%(filename)s:%(lineno)d} %(message)s")
         logging.info(F'Starting with log level: {logging.getLevelName(log_level)}')
-
 
     @staticmethod
     def add_command_line_arguments(parser: argparse) -> argparse:
@@ -28,5 +26,5 @@ class LoggingConfigurator(CommandLineArgumentAdder):
                             help="Verbosity (between 0-4 occurrences with more leading to more "
                                  "verbose logging). CRITICAL=0, ERROR=1, WARN=2, INFO=3, "
                                  "DEBUG=4")
-    add_command_line_arguments = staticmethod(add_command_line_arguments)
 
+    add_command_line_arguments = staticmethod(add_command_line_arguments)
