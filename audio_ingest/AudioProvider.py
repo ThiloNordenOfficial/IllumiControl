@@ -58,7 +58,6 @@ class AudioProvider:
         )
 
     def get_next_bytes_of_stream(self):
-        # TODO WHY IS IT NOT BLOCKING?!!!?!??!????!
         return self.stream.read(self.chunk_size)
 
     @staticmethod
