@@ -1,8 +1,6 @@
 import argparse
 import logging
-import time
 import numpy as np
-from numpy import ndarray
 
 from CommandLineArgumentAdder import CommandLineArgumentAdder
 from shared import LoggingConfigurator
@@ -24,7 +22,7 @@ class ImageGenerator(CommandLineArgumentAdder):
         while True:
             audio_data = self.audio_data_receiver.read_on_update()
             logging.debug("Received audio data")
-            # TODO ACTUAL IMAGE GENERATION
+            # TODO ACTUAL IMAGE GENERATIO
             image = np.random.randint(0, 256, (self.height, self.width, self.depth, 3), dtype=np.uint8)
             self.image_data_sender.update(image)
             logging.debug("Updated image data")

@@ -3,3 +3,6 @@ coloredlogs~=15.0.1
 pyaudio~=0.2.13
 opensmile~=2.5.1
 pandas~=2.2.3
+torch~=2.6.0
+torchvision~=0.21.0
+torchaudio~=2.6.0

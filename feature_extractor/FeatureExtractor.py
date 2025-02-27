@@ -1,7 +1,5 @@
 import argparse
 import logging
-import pickle
-import time
 
 from CommandLineArgumentAdder import CommandLineArgumentAdder
 from feature_extractor.FixtureConfigurationLoader import FixtureConfigurationLoader
