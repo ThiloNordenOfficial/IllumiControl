@@ -60,6 +60,9 @@ class AudioIngest(CommandLineArgumentAdder):
 
     add_command_line_arguments = staticmethod(add_command_line_arguments)
 
+    def get_data_senders(self) -> dict[str, NumpyArraySender]:
+        return {"audio-data": self.audio_data_sender}
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(

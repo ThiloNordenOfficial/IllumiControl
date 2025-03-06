@@ -1,7 +1,7 @@
 from typing import Tuple, TypeGuard, List
 
-from feature_extractor.FixtureType import FixtureType
-from feature_extractor.DmxChannelType import DmxChannelType
+from feature_extractor.fixture.FixtureType import FixtureType
+from feature_extractor.fixture.DmxChannelType import DmxChannelType
 
 
 class Fixture:

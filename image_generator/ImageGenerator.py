@@ -1,31 +1,44 @@
 import argparse
 import logging
-import numpy as np
+from multiprocessing import Process
 
 from CommandLineArgumentAdder import CommandLineArgumentAdder
-from shared import LoggingConfigurator
-from shared.shared_memory.NumpyArrayReceiver import NumpyArrayReceiver
+from image_generator.Generator import Generator
 from shared.shared_memory.NumpyArraySender import NumpyArraySender
 
 
 class ImageGenerator(CommandLineArgumentAdder):
-    def __init__(self, args: argparse.Namespace, audio_data_sender: NumpyArraySender):
+    def __init__(self, args: argparse.Namespace, data_senders: dict[str, NumpyArraySender]):
         logging.debug("Initializing image generator")
         self.height = args.height
         self.width = args.width
         self.depth = args.depth
-        self.audio_data_receiver = NumpyArrayReceiver(audio_data_sender)
-        self.image_data_sender = NumpyArraySender((self.height, self.width, self.depth, 3), dtype=np.uint8)
+        self.generators = self._instantiate_generators(data_senders)
+        self.data_senders: dict[str, NumpyArraySender] = self._get_all_data_senders()
+
+    def _instantiate_generators(self, data_senders) -> list[Generator]:
+        generators = []
+        for generator_class in Generator.__subclasses__():
+            generators.append(generator_class(data_senders, self.height, self.width, self.depth))
+        return generators
+
+    def _get_all_data_senders(self) -> dict[str, NumpyArraySender]:
+        combined_senders = {}
+        for generator in self.generators:
+            combined_senders.update(generator.get_outbound_data_senders())
+        return combined_senders
 
     def run(self):
         logging.debug("Starting image generator run loop")
-        while True:
-            audio_data = self.audio_data_receiver.read_on_update()
-            logging.debug("Received audio data")
-            # TODO ACTUAL IMAGE GENERATIO
-            image = np.random.randint(0, 256, (self.height, self.width, self.depth, 3), dtype=np.uint8)
-            self.image_data_sender.update(image)
-            logging.debug("Updated image data")
+        generator_processes = []
+        for generator in self.generators:
+            generator_processes.append(Process(target=generator.generate))
+
+        for process in generator_processes:
+            process.start()
+
+        for process in generator_processes:
+            process.join()
 
     @staticmethod
     def add_command_line_arguments(parser: argparse) -> argparse:
@@ -36,21 +49,5 @@ class ImageGenerator(CommandLineArgumentAdder):
 
     add_command_line_arguments = staticmethod(add_command_line_arguments)
 
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        prog='Image Generator',
-        description='')
-    # Only add those arguments if run stand-alone
-    parser.add_argument("--audio-memory-name", dest='audio_memory_name', required=True)
-    parser.add_argument("--audio-memory-shape", dest='audio_memory_shape')
-    parser.add_argument("--audio-memory-dtype", dest='audio_memory_dtype')
-
-    ImageGenerator.add_command_line_arguments(parser)
-    LoggingConfigurator.add_command_line_arguments(parser)
-
-    args = parser.parse_args()
-
-    LoggingConfigurator(args)
-    ig = ImageGenerator(args, args.audio_memory_name, (1, 6373), np.float64)
-    ig.run()
+    def get_data_senders(self) -> dict[str, NumpyArraySender]:
+        return self.data_senders

@@ -1,7 +1,7 @@
 import json
 import logging
 
-from feature_extractor.Fixture import Fixture
+from feature_extractor.fixture.Fixture import Fixture
 
 
 class FixtureConfigurationLoader:

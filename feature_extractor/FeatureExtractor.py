@@ -1,32 +1,42 @@
 import argparse
 import logging
+from multiprocessing import Process, Manager
 
 from CommandLineArgumentAdder import CommandLineArgumentAdder
-from feature_extractor.FixtureConfigurationLoader import FixtureConfigurationLoader
-from shared import is_valid_file, LoggingConfigurator
+from feature_extractor.Extractor import Extractor
+from feature_extractor.fixture.FixtureConfigurationLoader import FixtureConfigurationLoader
+from shared import is_valid_file
 from shared.shared_memory import NumpyArraySender
-from shared.shared_memory.NumpyArrayReceiver import NumpyArrayReceiver
 
 
 class FeatureExtractor(CommandLineArgumentAdder):
-    def __init__(self, args: argparse.Namespace, image_data_sender: NumpyArraySender):
+    def __init__(self, args: argparse.Namespace, data_senders: dict[str, NumpyArraySender]):
         self.fixtures = FixtureConfigurationLoader(args.fixture_config).fixtures
-        self.image_data_receiver = NumpyArrayReceiver(image_data_sender)
+        self.dmx_sender = {}
+        self.extractors = self._instantiate_extractors(data_senders)
         logging.debug("Initializing feature extractor")
+
+    def _instantiate_extractors(self, data_senders) -> list[Extractor]:
+        extractors = []
+        for extractor_class in Extractor.__subclasses__():
+            extractors.append(extractor_class(data_senders, self.fixtures))
+        return extractors
 
     def run(self):
         logging.debug("Starting feature extractor run loop")
-        while True:
-            image = self.image_data_receiver.read_on_update()
-            logging.debug("Received image data")
-            # TODO think about more complex extraction methods than just reading the pixel values
-            # multiprocessing to parallelize the extraction of features might be feasible
-            for fixture in self.fixtures:
-                self.extract_dmx_values(fixture, image)
 
-    def extract_dmx_values(self, fixture, image):
-        rgb_value = image[fixture.position[0], fixture.position[1], fixture.position[2]]
-        logging.debug(f"Fixture {fixture.type} at position {fixture.position} has RGB value {rgb_value}")
+        extractor_processes = []
+
+        with Manager() as manager:
+            dmx_dict = manager.dict()
+            for extractor in self.extractors:
+                extractor_processes.append(Process(target=extractor.extract, args=(dmx_dict,)))
+
+            for process in extractor_processes:
+                process.start()
+
+            for process in extractor_processes:
+                process.join()
 
     @staticmethod
     def add_command_line_arguments(parser: argparse) -> argparse:
@@ -37,17 +47,3 @@ class FeatureExtractor(CommandLineArgumentAdder):
                             help="Path to the debug image")
 
     add_command_line_arguments = staticmethod(add_command_line_arguments)
-
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        prog='Feature Extractor',
-        description='')
-
-    FeatureExtractor.add_command_line_arguments(parser)
-    LoggingConfigurator.add_command_line_arguments(parser)
-
-    args = parser.parse_args()
-
-    LoggingConfigurator(args)
-    FeatureExtractor(args)

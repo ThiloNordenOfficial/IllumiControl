@@ -7,6 +7,7 @@ class NumpyArraySender:
     DataSender creates a shared memory block where a NumPy array along with a version number
     is stored. A Condition is used to notify receivers when an update occurs.
     """
+
     def __init__(self, shape, dtype=np.float64, shm_name=None):
         self.shape = shape
         self.dtype = np.dtype(dtype)
@@ -16,7 +17,7 @@ class NumpyArraySender:
 
         # Create the shared memory block
         self.shm = shared_memory.SharedMemory(create=True, size=self.total_size, name=shm_name)
-
+        self.name = self.shm.name
         # Create a NumPy view for the version number (first 8 bytes, as int64)
         self.version_array = np.ndarray((1,), dtype=np.int64, buffer=self.shm.buf[:8])
         self.version_array[0] = 0

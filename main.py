@@ -1,4 +1,5 @@
 import argparse
+import logging
 import threading
 from CommandLineArgumentAdder import CommandLineArgumentAdder
 from audio_ingest import AudioIngest
@@ -19,7 +20,6 @@ if __name__ == "__main__":
     # To set the arguments of other modules, they have to be known first
     for argument_adder in CommandLineArgumentAdder.__subclasses__():
         argument_adder.add_command_line_arguments(parser)
-
     # The config file is read, if provided, and the arguments are updated
     ConfigReader(config_arg, parser)
 
@@ -27,8 +27,8 @@ if __name__ == "__main__":
 
     LoggingConfigurator(cmdl_args)
     audio_ingest = AudioIngest(cmdl_args)
-    image_generator = ImageGenerator(cmdl_args, audio_ingest.audio_data_sender)
-    feature_extractor = FeatureExtractor(cmdl_args, image_generator.image_data_sender)
+    image_generator = ImageGenerator(cmdl_args, audio_ingest.get_data_senders())
+    feature_extractor = FeatureExtractor(cmdl_args, image_generator.get_data_senders())
 
     ingest_runner = threading.Thread(target=audio_ingest.run)
     image_runner = threading.Thread(target=image_generator.run)

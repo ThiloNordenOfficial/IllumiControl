@@ -24,13 +24,13 @@ class NumpyArrayReceiver:
         self.last_version = self.version_array[0]
         self.condition = nps.condition
 
-    def read_on_update(self) -> np.ndarray:
+    def read_on_update(self, timeout=None) -> np.ndarray:
         """
         Blocks until an update from DataSender occurs (i.e., the version number changes),
         then returns a copy of the updated array.
         """
         with self.condition:
-            self.condition.wait_for(lambda: self.version_array[0] != self.last_version)
+            self.condition.wait_for(lambda: self.version_array[0] != self.last_version, timeout)
             self.last_version = self.version_array[0]
 
         # TODO Think about returning a reference instead of a copy, to save time and memory
