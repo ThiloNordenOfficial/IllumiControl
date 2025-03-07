@@ -24,11 +24,16 @@ if __name__ == "__main__":
     ConfigReader(config_arg, parser)
 
     cmdl_args = parser.parse_args()
-
     LoggingConfigurator(cmdl_args)
+
+    data_senders = {}
     audio_ingest = AudioIngest(cmdl_args)
-    image_generator = ImageGenerator(cmdl_args, audio_ingest.get_data_senders())
-    feature_extractor = FeatureExtractor(cmdl_args, image_generator.get_data_senders())
+    data_senders.update(audio_ingest.get_data_senders())
+
+    image_generator = ImageGenerator(cmdl_args, data_senders)
+    data_senders.update(image_generator.get_data_senders())
+
+    feature_extractor = FeatureExtractor(cmdl_args, data_senders)
 
     ingest_runner = threading.Thread(target=audio_ingest.run)
     image_runner = threading.Thread(target=image_generator.run)

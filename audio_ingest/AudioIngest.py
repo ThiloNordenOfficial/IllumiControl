@@ -1,5 +1,6 @@
 import argparse
 import logging
+import time
 
 import numpy as np
 import opensmile
@@ -28,6 +29,7 @@ class AudioIngest(CommandLineArgumentAdder):
             feature_level=FeatureLevel.Functionals
         )
         self.audio_data_sender = NumpyArraySender(np.shape(self.digest()))
+        self.timing_sender = NumpyArraySender(shape=np.shape(np.array([1.])), dtype=np.float64)
         logging.debug("Audio ingest initialized")
 
     def digest(self) -> np.ndarray:
@@ -41,9 +43,18 @@ class AudioIngest(CommandLineArgumentAdder):
 
     def run(self):
         logging.debug("Starting audio ingest run loop")
+        time_between_chunks = self.audio_provider.time_between_chunks
         while True:
-            self.audio_data_sender.update(self.digest())
+            audio_data = self.digest()
+            self.timing_sender.update(np.array([time.time() + time_between_chunks]))
+            self.audio_data_sender.update(audio_data)
             logging.debug("Updated audio data")
+
+    def get_data_senders(self) -> dict[str, NumpyArraySender]:
+        return {
+            "audio-data": self.audio_data_sender,
+            "timing-data": self.timing_sender
+        }
 
     @staticmethod
     def add_command_line_arguments(parser: argparse) -> argparse:
@@ -59,9 +70,6 @@ class AudioIngest(CommandLineArgumentAdder):
         parser.add_argument("--feature-set", dest='feature_set', type=lambda x: is_valid_file(parser, x), required=True)
 
     add_command_line_arguments = staticmethod(add_command_line_arguments)
-
-    def get_data_senders(self) -> dict[str, NumpyArraySender]:
-        return {"audio-data": self.audio_data_sender}
 
 
 if __name__ == "__main__":

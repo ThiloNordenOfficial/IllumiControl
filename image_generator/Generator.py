@@ -1,5 +1,7 @@
+import asyncio
 import logging
 from abc import abstractmethod
+from typing import final
 
 from shared.shared_memory.NumpyArraySender import NumpyArraySender
 
@@ -17,8 +19,11 @@ class Generator(object):
 
     get_data_senders = abstractmethod(get_outbound_data_senders)
 
-    @abstractmethod
+    @final
     def generate(self):
-        pass
+        asyncio.run(self._generate())
 
-    generate = abstractmethod(generate)
+    @abstractmethod
+    async def _generate(self):
+        pass
+    _generate = abstractmethod(_generate)

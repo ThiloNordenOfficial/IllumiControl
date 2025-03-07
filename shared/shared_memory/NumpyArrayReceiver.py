@@ -1,3 +1,5 @@
+import time
+
 import numpy as np
 from multiprocessing import shared_memory
 from shared.shared_memory import NumpyArraySender
@@ -10,6 +12,9 @@ class NumpyArrayReceiver:
     """
 
     def __init__(self, nps: NumpyArraySender):
+        if not nps:
+            raise ValueError("NumpyArraySender instance must be provided")
+
         self.shape = nps.shape
         self.dtype = np.dtype(nps.dtype)
         self.data_size = np.prod(self.shape) * self.dtype.itemsize
@@ -24,13 +29,15 @@ class NumpyArrayReceiver:
         self.last_version = self.version_array[0]
         self.condition = nps.condition
 
-    def read_on_update(self, timeout=None) -> np.ndarray:
+    def read_on_update(self, timeout: float = None) -> np.ndarray:
         """
         Blocks until an update from DataSender occurs (i.e., the version number changes),
         then returns a copy of the updated array.
         """
         with self.condition:
-            self.condition.wait_for(lambda: self.version_array[0] != self.last_version, timeout)
+            successful = self.condition.wait_for(lambda: self.version_array[0] != self.last_version, timeout)
+            if not successful:
+                raise TimeoutError()
             self.last_version = self.version_array[0]
 
         # TODO Think about returning a reference instead of a copy, to save time and memory

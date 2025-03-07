@@ -1,4 +1,6 @@
+import asyncio
 from abc import abstractmethod
+from typing import final
 
 from shared.shared_memory.NumpyArraySender import NumpyArraySender
 
@@ -8,8 +10,12 @@ class Extractor(object):
         self.inbound_data_senders = inbound_data_senders
         self.fixtures = fixtures
 
-    @abstractmethod
+    @final
     def extract(self):
+        asyncio.run(self._extract())
+
+    @abstractmethod
+    async def _extract(self):
         pass
 
-    extract = abstractmethod(extract)
+    _extract = abstractmethod(_extract)

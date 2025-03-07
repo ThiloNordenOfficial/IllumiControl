@@ -24,19 +24,15 @@ class FeatureExtractor(CommandLineArgumentAdder):
 
     def run(self):
         logging.debug("Starting feature extractor run loop")
-
         extractor_processes = []
+        for extractor in self.extractors:
+            extractor_processes.append(Process(target=extractor.extract))
 
-        with Manager() as manager:
-            dmx_dict = manager.dict()
-            for extractor in self.extractors:
-                extractor_processes.append(Process(target=extractor.extract, args=(dmx_dict,)))
+        for process in extractor_processes:
+            process.start()
 
-            for process in extractor_processes:
-                process.start()
-
-            for process in extractor_processes:
-                process.join()
+        for process in extractor_processes:
+            process.join()
 
     @staticmethod
     def add_command_line_arguments(parser: argparse) -> argparse:

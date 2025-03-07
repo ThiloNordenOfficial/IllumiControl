@@ -4,21 +4,6 @@ import math
 import pyaudio
 
 
-# {
-#     'index': 5,
-#     'structVersion': 2,
-#     'name': 'GENERAL WEBCAM: USB Audio (hw:1,0)',
-#     'hostApi': 0,
-#     'maxInputChannels': 1,
-#     'maxOutputChannels': 0,
-#     'defaultLowInputLatency': 0.0239375,
-#     'defaultLowOutputLatency': -1.0,
-#     'defaultHighInputLatency': 0.096,
-#     'defaultHighOutputLatency': -1.0,
-#     'defaultSampleRate': 16000.0
-# }
-
-
 class AudioProvider:
     DEFAULT_CHANNELS = 1
     DEFAULT_DTYPE = pyaudio.paInt32
@@ -32,6 +17,7 @@ class AudioProvider:
         self.channels: int = channels if channels is not None else AudioProvider.DEFAULT_CHANNELS
         self.dtype = AudioProvider.DEFAULT_DTYPE
         self.stream: pyaudio.Stream = self.setup_stream()
+        self.time_between_chunks: float = self.sample_rate / self.chunk_size
 
     def detect_sample_rate(self) -> int:
         detected_sample_rate = self.p.get_device_info_by_index(self.device_index)['defaultSampleRate']
@@ -59,6 +45,9 @@ class AudioProvider:
 
     def get_next_bytes_of_stream(self):
         return self.stream.read(self.chunk_size)
+
+    def get_time_between_chunks(self):
+        pass
 
     @staticmethod
     def list_devices():
