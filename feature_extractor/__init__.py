@@ -1,6 +1,3 @@
 from .FeatureExtractor import FeatureExtractor
-from feature_extractor.fixture.FixtureConfigurationLoader import FixtureConfigurationLoader
-from feature_extractor.fixture.Fixture import Fixture
-from feature_extractor.fixture.DmxChannelType import DmxChannelType
-from feature_extractor.fixture.FixtureType import FixtureType
+import feature_extractor.fixture
 from .RGBExtractor import RGBExtractor

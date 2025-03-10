@@ -1,4 +1,5 @@
-from .is_valid_file import is_valid_file
+from shared.validators.is_valid_file import is_valid_file
+from shared.validators.is_valid_ip import is_valid_ip
 from .LoggingConfigurator import LoggingConfigurator
 from .shared_memory import NumpyArraySender, NumpyArrayReceiver
 from .ConfigReader import ConfigReader

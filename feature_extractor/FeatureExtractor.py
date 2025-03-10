@@ -1,12 +1,13 @@
 import argparse
 import logging
-from multiprocessing import Process, Manager
+from multiprocessing import Process
 
 from CommandLineArgumentAdder import CommandLineArgumentAdder
 from feature_extractor.Extractor import Extractor
-from feature_extractor.fixture.FixtureConfigurationLoader import FixtureConfigurationLoader
+from feature_extractor.fixture import FixtureConfigurationLoader
 from shared import is_valid_file
 from shared.shared_memory import NumpyArraySender
+from shared.validators.is_valid_ip import is_valid_ip
 
 
 class FeatureExtractor(CommandLineArgumentAdder):
@@ -41,5 +42,7 @@ class FeatureExtractor(CommandLineArgumentAdder):
         # TODO For dev purposes, till the image is generated
         parser.add_argument("-i", "--input", dest='input_image', required=True, type=lambda x: is_valid_file(parser, x),
                             help="Path to the debug image")
+        parser.add_argument("--artnet-ip", dest='artnet_ip', required=True, type=lambda x: is_valid_ip(parser, x),
+                            help="IP of the artnet server")
 
     add_command_line_arguments = staticmethod(add_command_line_arguments)

@@ -1,7 +1,7 @@
 from typing import Tuple, TypeGuard, List
 
 from feature_extractor.fixture.FixtureType import FixtureType
-from feature_extractor.fixture.DmxChannelType import DmxChannelType
+from feature_extractor.fixture.ChannelType import ChannelType
 
 
 class Fixture:
@@ -11,8 +11,8 @@ class Fixture:
         self.fixture_id: int = fixture_id
         self.type: FixtureType = FixtureType(fixture_type)
         self.dmx_universe: int = dmx_universe
-        self.dmx_addresses: [Tuple[int, DmxChannelType]] = [(addr, DmxChannelType(ch_type)) for addr, ch_type in
-                                                            dmx_addresses]
+        self.dmx_addresses: [Tuple[int, ChannelType]] = [(addr, ChannelType(ch_type)) for addr, ch_type in
+                                                         dmx_addresses]
         self.position: Tuple[int, int, int] = position
 
     def __str__(self):
@@ -48,9 +48,9 @@ def verify_dmx_address(dmx_address):
         verify_dmx_channel_type(address[1])
 
 
-def verify_dmx_channel_type(channel_type) -> TypeGuard[DmxChannelType]:
+def verify_dmx_channel_type(channel_type) -> TypeGuard[ChannelType]:
     try:
-        DmxChannelType(channel_type)
+        ChannelType(channel_type)
         return True
     except KeyError:
         raise ValueError(f"Unknown channel type: {channel_type}")
