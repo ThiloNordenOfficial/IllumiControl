@@ -8,15 +8,15 @@
           "type": "PAR",
           "dmx_addresses": [
             {
-              "channel": 1,
+              "channel": 5,
               "channel_type": "COLOR_RED"
             },
             {
-              "channel": 2,
+              "channel": 6,
               "channel_type": "COLOR_GREEN"
             },
             {
-              "channel": 3,
+              "channel": 7,
               "channel_type": "COLOR_BLUE"
             }
           ],
@@ -24,6 +24,29 @@
             0,
             0,
             0
+          ]
+        },
+        {
+          "id": 2,
+          "type": "PAR",
+          "dmx_addresses": [
+            {
+              "channel": 21,
+              "channel_type": "COLOR_RED"
+            },
+            {
+              "channel": 22,
+              "channel_type": "COLOR_GREEN"
+            },
+            {
+              "channel": 23,
+              "channel_type": "COLOR_BLUE"
+            }
+          ],
+          "position": [
+            2,
+            3,
+            4
           ]
         }
       ]
