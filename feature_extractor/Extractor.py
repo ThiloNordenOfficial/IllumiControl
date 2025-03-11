@@ -1,21 +1,50 @@
 import asyncio
+import logging
+import time
 from abc import abstractmethod
+from asyncio import timeout
 from typing import final
 
+from shared import TimingReceiver
+from shared.DmxQueueUser import DmxQueueUser
 from shared.shared_memory.NumpyArraySender import NumpyArraySender
 
 
-class Extractor(object):
+class Extractor(TimingReceiver, DmxQueueUser):
     def __init__(self, inbound_data_senders: dict[str, NumpyArraySender], fixtures):
+        TimingReceiver.__init__(self, inbound_data_senders)
+        DmxQueueUser.__init__(self)
+
         self.inbound_data_senders = inbound_data_senders
         self.fixtures = fixtures
 
+    @abstractmethod
+    def delete(self):
+        TimingReceiver.delete(self)
+        DmxQueueUser.delete(self)
+
+        del self.inbound_data_senders
+        del self.fixtures
+
+    delete = abstractmethod(delete)
+
     @final
-    def extract(self):
+    def run(self):
         asyncio.run(self._extract())
 
-    @abstractmethod
+    @final
     async def _extract(self):
+        while not self.kill_event.is_set():
+            try:
+                timout_in_sec = float(self.timing_receiver.read_on_update()[0]) - time.time()
+                async with timeout(timout_in_sec):
+                    self.extract()
+            except asyncio.TimeoutError:
+                logging.warning(F"Dropped {self.__class__.__name__} step due to not finishing in time for next frame")
+        self.delete()
+
+    @abstractmethod
+    def extract(self):
         pass
 
-    _extract = abstractmethod(_extract)
+    extract = abstractmethod(extract)

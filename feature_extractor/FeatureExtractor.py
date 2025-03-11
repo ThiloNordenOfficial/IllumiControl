@@ -6,7 +6,7 @@ from ipcqueue.posixmq import Queue
 
 from CommandLineArgumentAdder import CommandLineArgumentAdder
 from feature_extractor.Extractor import Extractor
-from feature_extractor.dmx.DmxConverter import DmxConverter
+from feature_extractor.dmx.DmxConverter import DmxConverterUser
 from feature_extractor.fixture import FixtureConfigurationLoader
 from shared import is_valid_file
 from shared.shared_memory import NumpyArraySender
@@ -17,7 +17,7 @@ class FeatureExtractor(CommandLineArgumentAdder):
     def __init__(self, args: argparse.Namespace, data_senders: dict[str, NumpyArraySender]):
         self.fixtures = FixtureConfigurationLoader(args.fixture_config).fixtures
         self.dmx_queue = Queue("/dmx_queue")
-        self.dmx_sender = DmxConverter(data_senders, args.artnet_ip, fixtures=self.fixtures)
+        self.dmx_sender = DmxConverterUser(data_senders, args.artnet_ip, fixtures=self.fixtures)
         self.extractors = self._instantiate_extractors(data_senders)
         logging.debug("Initializing feature extractor")
 
@@ -32,7 +32,7 @@ class FeatureExtractor(CommandLineArgumentAdder):
         extractor_processes = []
         sender_process = Process(target=self.dmx_sender.run)
         for extractor in self.extractors:
-            extractor_processes.append(Process(target=extractor.extract))
+            extractor_processes.append(Process(target=extractor.run))
 
         for process in extractor_processes:
             process.start()

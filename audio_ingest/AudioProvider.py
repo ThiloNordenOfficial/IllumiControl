@@ -3,9 +3,12 @@ import math
 
 import pyaudio
 
+from shared import GracefulKiller
 
-class AudioProvider:
+
+class AudioProvider(GracefulKiller):
     DEFAULT_CHANNELS = 1
+
     DEFAULT_DTYPE = pyaudio.paInt32
 
     def __init__(self, device_index=None, sample_rate=None, chunk_size=None, channels=None):
@@ -18,6 +21,10 @@ class AudioProvider:
         self.dtype = AudioProvider.DEFAULT_DTYPE
         self.stream: pyaudio.Stream = self.setup_stream()
         self.time_between_chunks: float = self.sample_rate / self.chunk_size
+
+    def delete(self):
+        self.stream.close()
+
 
     def detect_sample_rate(self) -> int:
         detected_sample_rate = self.p.get_device_info_by_index(self.device_index)['defaultSampleRate']

@@ -32,13 +32,14 @@ class ImageGenerator(CommandLineArgumentAdder):
         logging.debug("Starting image generator run loop")
         generator_processes = []
         for generator in self.generators:
-            generator_processes.append(Process(target=generator.generate))
+            generator_processes.append(Process(target=generator.run))
 
         for process in generator_processes:
             process.start()
 
         for process in generator_processes:
             process.join()
+
 
     @staticmethod
     def add_command_line_arguments(parser: argparse) -> argparse:
