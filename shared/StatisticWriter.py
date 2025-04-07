@@ -1,5 +1,6 @@
 import logging
 import os
+from datetime import datetime
 from typing import TextIO
 
 from shared import GracefulKiller
@@ -31,5 +32,5 @@ class StatisticWriter(GracefulKiller):
         :param data: The time it took to generate and extract.
         """
         if self.statistics_are_active:
-            self._file_handle.write(f"{data}\n")
+            self._file_handle.write(f"{datetime.now()}: {data}\n")
             self._file_handle.flush()
