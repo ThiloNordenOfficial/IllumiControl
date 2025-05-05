@@ -8,3 +8,8 @@ class CommandLineArgumentAdder(object):
     @abstractmethod
     def add_command_line_arguments(parser: argparse) -> argparse:
         pass
+
+    @classmethod
+    @abstractmethod
+    def apply_command_line_arguments(cls,  args: argparse.Namespace):
+        pass

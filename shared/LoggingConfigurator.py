@@ -7,7 +7,9 @@ from CommandLineArgumentAdder import CommandLineArgumentAdder
 
 
 class LoggingConfigurator(CommandLineArgumentAdder):
-    def __init__(self, args: argparse.Namespace):
+    verbosity = None
+
+    def __init__(self):
         log_levels = {
             0: logging.CRITICAL,
             1: logging.ERROR,
@@ -15,7 +17,7 @@ class LoggingConfigurator(CommandLineArgumentAdder):
             3: logging.INFO,
             4: logging.DEBUG,
         }
-        log_level = log_levels[min(int(args.verbosity), max(log_levels.keys()))]
+        log_level = log_levels[min(int(self.verbosity), max(log_levels.keys()))]
         coloredlogs.install(level=log_level,
                             fmt="%(asctime)s %(name)s[%(process)d] %(levelname)s {%(filename)s:%(lineno)d} %(message)s")
         logging.info(F'Starting with log level: {logging.getLevelName(log_level)}')
@@ -28,3 +30,7 @@ class LoggingConfigurator(CommandLineArgumentAdder):
                                  "DEBUG=4")
 
     add_command_line_arguments = staticmethod(add_command_line_arguments)
+
+    @classmethod
+    def apply_command_line_arguments(cls, args: argparse.Namespace):
+        cls.verbosity = args.verbosity

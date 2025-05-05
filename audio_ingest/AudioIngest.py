@@ -13,21 +13,27 @@ from shared.shared_memory.NumpyArraySender import NumpyArraySender
 
 
 class AudioIngest(CommandLineArgumentAdder, GracefulKiller):
-    def __init__(self, args: argparse.Namespace):
+    list_audio_devices = None
+    audio_device = None
+    sample_rate = None
+    chunk_size = None
+    feature_set = None
+
+    def __init__(self):
         logging.debug("Initializing audio ingest")
 
-        if args.list_audio_devices is not None:
+        if self.list_audio_devices is not None:
             AudioProvider.list_devices()
             print("Audio devices listed, now exiting")
             exit(0)
 
         self.audio_provider = AudioProvider(
-            device_index=args.audio_device,
-            sample_rate=args.sample_rate,
-            chunk_size=args.chunk_size
+            device_index=self.audio_device,
+            sample_rate=self.sample_rate,
+            chunk_size=self.chunk_size
         )
         self.smile = opensmile.Smile(
-            feature_set=args.feature_set,
+            feature_set=self.feature_set,
             feature_level=FeatureLevel.Functionals
         )
         self.audio_data_sender = NumpyArraySender(np.shape(self.digest()))
@@ -78,3 +84,11 @@ class AudioIngest(CommandLineArgumentAdder, GracefulKiller):
         parser.add_argument("--feature-set", dest='feature_set', type=lambda x: is_valid_file(parser, x), required=True)
 
     add_command_line_arguments = staticmethod(add_command_line_arguments)
+
+    @classmethod
+    def apply_command_line_arguments(cls, args: argparse.Namespace):
+        cls.list_audio_devices = args.list_audio_devices
+        cls.audio_device = args.audio_device
+        cls.sample_rate = args.sample_rate
+        cls.chunk_size = args.chunk_size
+        cls.feature_set = args.feature_set

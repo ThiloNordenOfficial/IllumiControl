@@ -1,19 +1,20 @@
-import logging
+import argparse
 import os
 from datetime import datetime
 from typing import TextIO
 
+from CommandLineArgumentAdder import CommandLineArgumentAdder
 from shared import GracefulKiller
+from shared.validators.is_valid_file import is_valid_file
 
 
-class StatisticWriter(GracefulKiller):
+class StatisticWriter(GracefulKiller, CommandLineArgumentAdder):
     statistics_are_active = False
 
     def __init__(self):
         """
         Initialize the StatisticWriter. This class is used to write statistics to a file.
         """
-        self.statistics_are_active = logging.getLogger().getEffectiveLevel() == logging.DEBUG
         self._extractor_name = self.__class__.__name__
         if self.statistics_are_active:
             self._file_handle: TextIO = self._setup_statistics()
@@ -34,3 +35,15 @@ class StatisticWriter(GracefulKiller):
         if self.statistics_are_active:
             self._file_handle.write(f"{datetime.now()}: {data}\n")
             self._file_handle.flush()
+
+    @staticmethod
+    def add_command_line_arguments(parser: argparse) -> argparse:
+        parser.add_argument("-stats", "--statistics", dest='statistics', action='store_true', default=False,
+                            help="Enable writing statistics of extractors to file")
+        parser.add_argument("-stats-path", "--statistics-path", dest='statistics_path', default="statistics",
+                            type=lambda x: is_valid_file(parser, x), help="Path to the statistics folder")
+        return parser
+
+    @classmethod
+    def apply_command_line_arguments(cls, args: argparse.Namespace):
+        cls.statistics_are_active = args.statistics

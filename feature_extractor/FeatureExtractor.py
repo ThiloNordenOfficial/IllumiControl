@@ -14,10 +14,13 @@ from shared.validators.is_valid_ip import is_valid_ip
 
 
 class FeatureExtractor(CommandLineArgumentAdder):
-    def __init__(self, args: argparse.Namespace, data_senders: dict[str, NumpyArraySender]):
-        self.fixtures = FixtureConfigurationLoader(args.fixture_config).fixtures
+    fixture_config = None
+    artnet_ip = None
+
+    def __init__(self, data_senders: dict[str, NumpyArraySender]):
+        self.fixtures = FixtureConfigurationLoader(self.fixture_config).fixtures
         self.dmx_queue = Queue("/dmx_queue")
-        self.dmx_sender = DmxConverterUser(data_senders, args.artnet_ip, fixtures=self.fixtures)
+        self.dmx_sender = DmxConverterUser(data_senders, self.artnet_ip, fixtures=self.fixtures)
         self.extractors = self._instantiate_extractors(data_senders)
         logging.debug("Initializing feature extractor")
 
@@ -46,10 +49,12 @@ class FeatureExtractor(CommandLineArgumentAdder):
     def add_command_line_arguments(parser: argparse) -> argparse:
         parser.add_argument("-fc", "--fixture-config", dest='fixture_config', required=True,
                             type=lambda x: is_valid_file(parser, x), help="Path to the fixture configuration file")
-        # TODO For dev purposes, till the image is generated
-        parser.add_argument("-i", "--input", dest='input_image', required=True, type=lambda x: is_valid_file(parser, x),
-                            help="Path to the debug image")
         parser.add_argument("--artnet-ip", dest='artnet_ip', required=True, type=lambda x: is_valid_ip(parser, x),
                             help="IP of the artnet server")
 
     add_command_line_arguments = staticmethod(add_command_line_arguments)
+
+    @classmethod
+    def apply_command_line_arguments(cls, args: argparse.Namespace):
+        cls.artnet_ip = args.artnet_ip
+        cls.fixture_config = args.fixture_config

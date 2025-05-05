@@ -8,11 +8,12 @@ from shared.shared_memory.NumpyArraySender import NumpyArraySender
 
 
 class ImageGenerator(CommandLineArgumentAdder):
-    def __init__(self, args: argparse.Namespace, data_senders: dict[str, NumpyArraySender]):
+    height = None
+    width = None
+    depth = None
+
+    def __init__(self, data_senders: dict[str, NumpyArraySender]):
         logging.debug("Initializing image generator")
-        self.height = args.height
-        self.width = args.width
-        self.depth = args.depth
         self.generators = self._instantiate_generators(data_senders)
         self.data_senders: dict[str, NumpyArraySender] = self._get_all_data_senders()
 
@@ -49,6 +50,12 @@ class ImageGenerator(CommandLineArgumentAdder):
         parser.add_argument("--depth", dest='depth', type=int, default=10, help="Depth of the image in pixels")
 
     add_command_line_arguments = staticmethod(add_command_line_arguments)
+
+    @classmethod
+    def apply_command_line_arguments(cls, args: argparse.Namespace):
+        cls.height = args.height
+        cls.width = args.width
+        cls.depth = args.depth
 
     def get_data_senders(self) -> dict[str, NumpyArraySender]:
         return self.data_senders
