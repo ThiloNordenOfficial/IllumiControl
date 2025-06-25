@@ -3,10 +3,10 @@ import logging
 import signal
 import threading
 
-from CommandLineArgumentAdder import CommandLineArgumentAdder
-from audio_ingest import AudioIngest
-from feature_extractor import FeatureExtractor
-from image_generator import ImageGenerator
+from shared.CommandLineArgumentAdder import CommandLineArgumentAdder
+from ingest import Ingests
+from extractor import Extractors
+from generator import Generators
 from shared import ConfigReader, GracefulKiller, LoggingConfigurator
 
 
@@ -50,13 +50,13 @@ class IllumiControl:
         signal.signal(signal.SIGTERM, IllumiControl.set_shutdown_event)
 
     def initialize_components(self):
-        self.audio_ingest = AudioIngest(self.data_senders)
+        self.audio_ingest = Ingests(self.data_senders)
         self.data_senders.update(self.audio_ingest.get_outbound_data_senders())
 
-        self.image_generator = ImageGenerator(self.data_senders)
+        self.image_generator = Generators(self.data_senders)
         self.data_senders.update(self.image_generator.get_outbound_data_senders())
 
-        self.feature_extractor = FeatureExtractor(self.data_senders)
+        self.feature_extractor = Extractors(self.data_senders)
         # If postprocessing is done via shared memory, comment this in
         # self.data_senders.update(self.feature_extractor.get_outbound_data_senders())
 

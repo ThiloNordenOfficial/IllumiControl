@@ -10,3 +10,4 @@ from .StatisticWriter import StatisticWriter
 from .Runner import Runner
 from .TimedRunner import TimedRunner
 from .DataSender import DataSender
+from .fixture import *

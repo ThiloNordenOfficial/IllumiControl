@@ -3,7 +3,7 @@ import os
 from datetime import datetime
 from typing import TextIO
 
-from CommandLineArgumentAdder import CommandLineArgumentAdder
+from shared.CommandLineArgumentAdder import CommandLineArgumentAdder
 from shared import GracefulKiller
 from shared.validators.is_valid_file import is_valid_file
 

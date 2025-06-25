@@ -3,7 +3,7 @@ import logging
 
 import coloredlogs
 
-from CommandLineArgumentAdder import CommandLineArgumentAdder
+from shared.CommandLineArgumentAdder import CommandLineArgumentAdder
 
 
 class LoggingConfigurator(CommandLineArgumentAdder):
