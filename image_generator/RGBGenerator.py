@@ -1,5 +1,3 @@
-import logging
-
 import numpy as np
 
 from image_generator.Generator import Generator
@@ -23,10 +21,10 @@ class RGBGenerator(Generator):
         for sender in self.outbound_data_senders.values():
             sender.close()
 
-    def get_outbound_data_senders(self) -> dict[str, NumpyArraySender]:
-        return self.outbound_data_senders
-
-    def generate(self):
+    def run_procedure(self):
         audio_data = self.data_receiver.read_on_update()
         image = np.random.randint(0, 256, self.shape, dtype=np.uint8)
         self.rgb_data_sender.update(image)
+
+    def get_outbound_data_senders(self) -> dict[str, NumpyArraySender]:
+        return self.outbound_data_senders

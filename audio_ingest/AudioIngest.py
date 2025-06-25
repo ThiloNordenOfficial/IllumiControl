@@ -1,94 +1,45 @@
-import argparse
 import logging
-import time
-
-import numpy as np
-import opensmile
-from opensmile import FeatureLevel
+from multiprocessing import Process
 
 from audio_ingest.AudioProvider import AudioProvider
-from CommandLineArgumentAdder import CommandLineArgumentAdder
-from shared import is_valid_file, GracefulKiller
+from audio_ingest.Analyser import Analyser
+from shared import DataSender
 from shared.shared_memory.NumpyArraySender import NumpyArraySender
 
 
-class AudioIngest(CommandLineArgumentAdder, GracefulKiller):
-    list_audio_devices = None
-    audio_device = None
-    sample_rate = None
-    chunk_size = None
-    feature_set = None
-
-    def __init__(self):
+class AudioIngest(DataSender):
+    def __init__(self, data_senders: dict[str, NumpyArraySender]):
         logging.debug("Initializing audio ingest")
+        self.audio_provider = AudioProvider()
 
-        if self.list_audio_devices is not None:
-            AudioProvider.list_devices()
-            print("Audio devices listed, now exiting")
-            exit(0)
-
-        self.audio_provider = AudioProvider(
-            device_index=self.audio_device,
-            sample_rate=self.sample_rate,
-            chunk_size=self.chunk_size
-        )
-        self.smile = opensmile.Smile(
-            feature_set=self.feature_set,
-            feature_level=FeatureLevel.Functionals
-        )
-        self.audio_data_sender = NumpyArraySender(np.shape(self.digest()))
-        self.timing_sender = NumpyArraySender(shape=np.shape(np.array([1.])), dtype=np.float64)
+        data_senders.update(self.audio_provider.get_outbound_data_senders())
+        self.analysers = self._instantiate_analysers(data_senders)
+        self.data_senders: dict[str, NumpyArraySender] = self._get_all_data_senders(data_senders)
         logging.debug("Audio ingest initialized")
 
-    def delete(self):
-        del self.audio_provider
-        del self.smile
-        del self.audio_data_sender
-        del self.timing_sender
+    def _instantiate_analysers(self, data_senders) -> list[Analyser]:
+        analysers = []
+        for analyser_class in Analyser.__subclasses__():
+            analysers.append(analyser_class(data_senders))
+        return analysers
 
-    def digest(self) -> np.ndarray:
-        return self.smile.process_signal(
-            np.frombuffer(
-                self.audio_provider.get_next_bytes_of_stream(),
-                dtype=np.int32
-            ),
-            self.audio_provider.sample_rate
-        ).to_numpy()
+    def _get_all_data_senders(self, data_senders: dict[str, NumpyArraySender]) -> dict[str, NumpyArraySender]:
+        combined_senders = data_senders
+        for analyser in self.analysers:
+            combined_senders.update(analyser.get_outbound_data_senders())
+        return combined_senders
 
     def run(self):
-        logging.debug("Starting audio ingest run loop")
-        time_between_chunks = self.audio_provider.time_between_chunks
-        while not self.kill_event.is_set():
-            audio_data = self.digest()
-            self.timing_sender.update(np.array([time.time() + time_between_chunks]))
-            self.audio_data_sender.update(audio_data)
-        self.delete()
+        logging.debug("Starting ingest run loop")
+        analyser_processes = []
+        for analyser in self.analysers:
+            analyser_processes.append(Process(target=analyser.run))
 
-    def get_data_senders(self) -> dict[str, NumpyArraySender]:
-        return {
-            "audio-data": self.audio_data_sender,
-            "timing-data": self.timing_sender
-        }
+        for process in analyser_processes:
+            process.start()
 
-    @staticmethod
-    def add_command_line_arguments(parser: argparse) -> argparse:
-        parser.add_argument("--list-audio-devices", dest='list_audio_devices',
-                            help="List all available audio devices and exit")
-        parser.add_argument("--audio-device", dest='audio_device', type=int,
-                            help="Device index of the audio input device")
-        parser.add_argument("--sample-rate", dest='sample_rate', type=int,
-                            help="Desired sample rate of the audio input device, if not provided the default sample rate of the device will be used")
-        parser.add_argument("--chunk-size", dest='chunk_size', type=int, help="Frames per buffer")
-        parser.add_argument("--channels", dest='channels', type=int,
-                            help="Number of channels of the audio stream, if not provided the stream will be mono")
-        parser.add_argument("--feature-set", dest='feature_set', type=lambda x: is_valid_file(parser, x), required=True)
+        for process in analyser_processes:
+            process.join()
 
-    add_command_line_arguments = staticmethod(add_command_line_arguments)
-
-    @classmethod
-    def apply_command_line_arguments(cls, args: argparse.Namespace):
-        cls.list_audio_devices = args.list_audio_devices
-        cls.audio_device = args.audio_device
-        cls.sample_rate = args.sample_rate
-        cls.chunk_size = args.chunk_size
-        cls.feature_set = args.feature_set
+    def get_outbound_data_senders(self) -> dict[str, NumpyArraySender]:
+        return self.data_senders

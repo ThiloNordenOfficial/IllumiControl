@@ -4,10 +4,11 @@ from multiprocessing import Process
 
 from CommandLineArgumentAdder import CommandLineArgumentAdder
 from image_generator.Generator import Generator
+from shared import DataSender
 from shared.shared_memory.NumpyArraySender import NumpyArraySender
 
 
-class ImageGenerator(CommandLineArgumentAdder):
+class ImageGenerator(CommandLineArgumentAdder, DataSender):
     height = None
     width = None
     depth = None
@@ -57,5 +58,5 @@ class ImageGenerator(CommandLineArgumentAdder):
         cls.width = args.width
         cls.depth = args.depth
 
-    def get_data_senders(self) -> dict[str, NumpyArraySender]:
+    def get_outbound_data_senders(self) -> dict[str, NumpyArraySender]:
         return self.data_senders

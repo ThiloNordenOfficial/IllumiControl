@@ -2,10 +2,10 @@ from feature_extractor.Extractor import Extractor
 from feature_extractor.fixture import ChannelType as ct
 from shared.DmxChannelValue import DmxChannelValue
 from shared.shared_memory.NumpyArrayReceiver import NumpyArrayReceiver
+from shared.shared_memory.NumpyArraySender import NumpyArraySender
 
 
 class RGBExtractor(Extractor):
-
     def __init__(self, inbound_data_senders, fixtures):
         super().__init__(inbound_data_senders, fixtures)
         self.rgb_data_receiver = NumpyArrayReceiver(inbound_data_senders.get("RGB-image"))
@@ -18,7 +18,10 @@ class RGBExtractor(Extractor):
         self.rgb_data_receiver.close()
         del self.relevant_fixtures
 
-    def extract(self):
+    def get_outbound_data_senders(self) -> dict[str, NumpyArraySender]:
+        return {}
+
+    def run_procedure(self):
         rbg_data = self.rgb_data_receiver.read_on_update()
         dmx_frame = []
         for fixture in self.relevant_fixtures:

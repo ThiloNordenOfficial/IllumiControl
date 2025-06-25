@@ -50,13 +50,15 @@ class IllumiControl:
         signal.signal(signal.SIGTERM, IllumiControl.set_shutdown_event)
 
     def initialize_components(self):
-        self.audio_ingest = AudioIngest()
-        self.data_senders.update(self.audio_ingest.get_data_senders())
+        self.audio_ingest = AudioIngest(self.data_senders)
+        self.data_senders.update(self.audio_ingest.get_outbound_data_senders())
 
         self.image_generator = ImageGenerator(self.data_senders)
-        self.data_senders.update(self.image_generator.get_data_senders())
+        self.data_senders.update(self.image_generator.get_outbound_data_senders())
 
         self.feature_extractor = FeatureExtractor(self.data_senders)
+        # If postprocessing is done via shared memory, comment this in
+        # self.data_senders.update(self.feature_extractor.get_outbound_data_senders())
 
     def start_threads(self):
         ingest_runner = threading.Thread(target=self.audio_ingest.run)
@@ -79,6 +81,7 @@ class IllumiControl:
 
         self.initialize_components()
         self.start_threads()
+
         self.join_threads()
 
         logging.warning("Graceful shutdown of IllumiControl completed")

@@ -9,6 +9,7 @@ class NumpyArraySender:
     """
 
     def __init__(self, shape, dtype=np.float64, shm_name=None):
+        self.sender = self.__class__.__name__
         self.shape = shape
         self.dtype = np.dtype(dtype)
         self.data_nbytes = np.prod(shape) * self.dtype.itemsize
@@ -50,3 +51,4 @@ class NumpyArraySender:
         """
         self.shm.close()
         self.shm.unlink()
+        del self.shm
