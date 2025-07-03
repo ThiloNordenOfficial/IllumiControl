@@ -1,17 +1,15 @@
 from abc import abstractmethod
 
 from shared import DataSender
-from shared.Runner import Runner
-from shared.shared_memory.NumpyArraySender import NumpyArraySender
+from shared.shared_memory.Sender import Sender
 
 
-class IngestBase(DataSender, Runner):
-    def __init__(self, inbound_data_senders: dict[str, NumpyArraySender]):
+class IngestBase(DataSender):
+
+    def __init__(self):
         super().__init__()
-        self.inbound_data_senders = inbound_data_senders
 
     @abstractmethod
-    def delete(self):
-        del self.inbound_data_senders
-
-    delete = abstractmethod(delete)
+    def get_outbound_data_senders(self) -> dict[str, Sender]:
+        pass
+    abstractmethod(get_outbound_data_senders)

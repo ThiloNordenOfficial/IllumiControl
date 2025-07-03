@@ -7,7 +7,8 @@ from .GracefulKiller import GracefulKiller
 from .TimingReceiver import TimingReceiver
 from .DmxQueueUser import DmxQueueUser
 from .StatisticWriter import StatisticWriter
-from .Runner import Runner
-from .TimedRunner import TimedRunner
+from shared.runner.Runner import Runner
+from shared.runner.TimedRunner import TimedRunner
 from .DataSender import DataSender
 from .fixture import *
+from .shared_memory import *

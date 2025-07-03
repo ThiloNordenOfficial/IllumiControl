@@ -3,6 +3,7 @@ import numpy as np
 from generator.GeneratorBase import GeneratorBase
 from shared.shared_memory.NumpyArrayReceiver import NumpyArrayReceiver
 from shared.shared_memory.NumpyArraySender import NumpyArraySender
+from shared.shared_memory.Sender import Sender
 
 
 class RGBGenerator(GeneratorBase):
@@ -26,5 +27,5 @@ class RGBGenerator(GeneratorBase):
         image = np.random.randint(0, 256, self.shape, dtype=np.uint8)
         self.rgb_data_sender.update(image)
 
-    def get_outbound_data_senders(self) -> dict[str, NumpyArraySender]:
+    def get_outbound_data_senders(self) -> dict[str, Sender]:
         return self.outbound_data_senders

@@ -5,8 +5,7 @@ from abc import abstractmethod
 from asyncio import timeout
 from typing import final
 
-from shared import StatisticWriter
-from shared.Runner import Runner
+from shared.runner.Runner import Runner
 from shared.shared_memory.NumpyArrayReceiver import NumpyArrayReceiver
 from shared.shared_memory.NumpyArraySender import NumpyArraySender
 

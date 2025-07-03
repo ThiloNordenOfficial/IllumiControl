@@ -3,26 +3,29 @@ import logging
 import math
 from typing import Mapping
 
-import numpy as np
 import pyaudio
 
+from ingest.IngestBase import IngestBase
+from shared import GracefulKiller
 from shared.CommandLineArgumentAdder import CommandLineArgumentAdder
-from shared import GracefulKiller, DataSender
-from shared.shared_memory.NumpyArraySender import NumpyArraySender
+from shared.shared_memory.ByteSender import ByteSender
+from shared.shared_memory.Sender import Sender
 
 
-class AudioProvider(CommandLineArgumentAdder, GracefulKiller, DataSender):
+class AudioProvider(IngestBase, CommandLineArgumentAdder):
     list_audio_devices = None
     audio_device = None
     sample_rate = None
     chunk_size = None
     channels = None
+    audio_buffer_size = None
 
     def __init__(self):
         if self.list_audio_devices is not None:
             AudioProvider.list_devices()
             print("Audio devices listed, now exiting")
             exit(0)
+        super().__init__()
 
         self.p = pyaudio.PyAudio()
         self.device_index: int = AudioProvider.audio_device \
@@ -33,14 +36,11 @@ class AudioProvider(CommandLineArgumentAdder, GracefulKiller, DataSender):
             if AudioProvider.chunk_size is not None else self.detect_chunk_size()
         self.channels: int = AudioProvider.channels if AudioProvider.channels is not None else 1
         self.dtype = pyaudio.paInt32
-        self.stream: pyaudio.Stream = self.setup_stream()
-        self.time_between_chunks: float = self.sample_rate / self.chunk_size
-        # TODO SHAPE should be determined by chunk size and channels in ring buffer
-        self.raw_audio_data_sender = NumpyArraySender(shape=np.shape((3, 3)),
-                                                      dtype=np.int32)  # shm_name="raw-audio-dataasdf")
+        self._max_buffer_size = AudioProvider.audio_buffer_size \
+            if AudioProvider.audio_buffer_size is not None else self.sample_rate * 30 # Default to 30 seconds of audio buffer
+        self.raw_audio_data_sender = ByteSender(self._max_buffer_size)
 
     def delete(self):
-        self.stream.close()
         self.raw_audio_data_sender.close()
 
     def detect_sample_rate(self) -> int:
@@ -55,31 +55,29 @@ class AudioProvider(CommandLineArgumentAdder, GracefulKiller, DataSender):
         logging.debug(f"Detected sample rate: {self.sample_rate}")
         return self.detect_sample_rate()
 
-    def setup_stream(self) -> pyaudio.Stream:
-        logging.debug(
-            f"Setting up audio stream for device {self.device_index}: {self.p.get_device_info_by_index(self.device_index)}")
-        return self.p.open(
+    def run(self):
+        self.p.open(
             format=self.dtype,
             channels=self.channels,
             rate=self.sample_rate,
             input=True,
+            output=False,
             frames_per_buffer=self.chunk_size,
             input_device_index=self.device_index,
-            stream_callback=self.write_audio_to_memory
+            stream_callback=self.write_audio_to_memory,
+            start=True,
         )
 
-    def get_next_bytes_of_stream(self):
-        return self.stream.read(self.chunk_size)
-
-    @staticmethod
-    def write_audio_to_memory(in_data: bytes | None, frame_count: int, time_info: Mapping[str, float], status: int) -> \
+    def write_audio_to_memory(self, in_data: bytes | None, frame_count: int, time_info: Mapping[str, float],
+                              status: int) -> \
             tuple[bytes | None, int] | None:
-        logging.error(frame_count)
-        return in_data, frame_count
+        if in_data is not None:
+            self.raw_audio_data_sender.update(in_data)
+        return in_data, pyaudio.paAbort if GracefulKiller.kill_event.is_set() else pyaudio.paContinue
 
-    def get_outbound_data_senders(self) -> dict[str, NumpyArraySender]:
+    def get_outbound_data_senders(self) -> dict[str, Sender]:
         return {
-            "raw-audio-data": self.raw_audio_data_sender,
+            "b-raw-audio-data": self.raw_audio_data_sender,
         }
 
     @staticmethod
@@ -101,6 +99,7 @@ class AudioProvider(CommandLineArgumentAdder, GracefulKiller, DataSender):
         parser.add_argument("--chunk-size", dest='chunk_size', type=int, help="Frames per buffer")
         parser.add_argument("--channels", dest='channels', type=int,
                             help="Number of channels of the audio stream, if not provided the stream will be mono")
+        parser.add_argument("--audio-buffer-size", dest='audio_buffer_size', type=int)
 
     @classmethod
     def apply_command_line_arguments(cls, args: argparse.Namespace):
@@ -109,3 +108,4 @@ class AudioProvider(CommandLineArgumentAdder, GracefulKiller, DataSender):
         cls.sample_rate = args.sample_rate
         cls.chunk_size = args.chunk_size
         cls.channels = args.channels
+        cls.audio_buffer_size = args.audio_buffer_size

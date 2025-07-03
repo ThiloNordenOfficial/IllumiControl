@@ -3,6 +3,7 @@ from shared.fixture import ChannelType as ct
 from shared.DmxChannelValue import DmxChannelValue
 from shared.shared_memory.NumpyArrayReceiver import NumpyArrayReceiver
 from shared.shared_memory.NumpyArraySender import NumpyArraySender
+from shared.shared_memory.Sender import Sender
 
 
 class RGBExtractor(ExtractorBase):
@@ -18,7 +19,7 @@ class RGBExtractor(ExtractorBase):
         self.rgb_data_receiver.close()
         del self.relevant_fixtures
 
-    def get_outbound_data_senders(self) -> dict[str, NumpyArraySender]:
+    def get_outbound_data_senders(self) -> dict[str, Sender]:
         return {}
 
     def run_procedure(self):

@@ -1,3 +1,2 @@
-from .Ingests import Ingests
+from .Ingest import Ingests
 from .AudioProvider import AudioProvider
-from .OpenSMILEAnalyser import OpenSmileAnalyser

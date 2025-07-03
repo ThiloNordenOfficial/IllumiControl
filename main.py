@@ -3,6 +3,7 @@ import logging
 import signal
 import threading
 
+from analyser.Analyser import Analyser
 from shared.CommandLineArgumentAdder import CommandLineArgumentAdder
 from ingest import Ingests
 from extractor import Extractors
@@ -13,9 +14,10 @@ from shared import ConfigReader, GracefulKiller, LoggingConfigurator
 class IllumiControl:
     def __init__(self):
         self.data_senders = {}
-        self.audio_ingest = None
-        self.image_generator = None
-        self.feature_extractor = None
+        self.ingestors = None
+        self.analysers = None
+        self.generators = None
+        self.extractors = None
         self.threads = []
 
     def prepare_commandline_arguments(self) -> argparse.Namespace:
@@ -50,22 +52,27 @@ class IllumiControl:
         signal.signal(signal.SIGTERM, IllumiControl.set_shutdown_event)
 
     def initialize_components(self):
-        self.audio_ingest = Ingests(self.data_senders)
-        self.data_senders.update(self.audio_ingest.get_outbound_data_senders())
+        self.ingestors = Ingests()
+        self.data_senders.update(self.ingestors.get_outbound_data_senders())
 
-        self.image_generator = Generators(self.data_senders)
-        self.data_senders.update(self.image_generator.get_outbound_data_senders())
+        self.analysers = Analyser(self.data_senders)
+        self.data_senders.update(self.analysers.get_outbound_data_senders())
 
-        self.feature_extractor = Extractors(self.data_senders)
+        logging.error(self.data_senders)
+        self.generators = Generators(self.data_senders)
+        self.data_senders.update(self.generators.get_outbound_data_senders())
+
+        self.extractors = Extractors(self.data_senders)
         # If postprocessing is done via shared memory, comment this in
         # self.data_senders.update(self.feature_extractor.get_outbound_data_senders())
 
     def start_threads(self):
-        ingest_runner = threading.Thread(target=self.audio_ingest.run)
-        image_runner = threading.Thread(target=self.image_generator.run)
-        feature_runner = threading.Thread(target=self.feature_extractor.run)
+        ingest_runner = threading.Thread(target=self.ingestors.run)
+        analyser_runner = threading.Thread(target=self.analysers.run)
+        generator_runner = threading.Thread(target=self.generators.run)
+        extractor_runner = threading.Thread(target=self.extractors.run)
 
-        self.threads = [ingest_runner, image_runner, feature_runner]
+        self.threads = [ingest_runner, analyser_runner, generator_runner, extractor_runner]
         for thread in self.threads:
             thread.start()
 
