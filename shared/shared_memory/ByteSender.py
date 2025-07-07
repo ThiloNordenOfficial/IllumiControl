@@ -1,53 +1,46 @@
-from threading import Lock
-from shared.shared_memory.LimitedBytesIO import LimitedBytesIO
+import threading
+from multiprocessing import shared_memory
 from shared.shared_memory.Sender import Sender, T
 import logging
 
 
 class ByteSender(Sender[bytes]):
-    def __init__(self, max_size):
+    def __init__(self, size, shm_name=None):
         super().__init__()
-        self.sender = self.__class__.__name__
-        self.max_size = max_size
-        self.byte_stream = LimitedBytesIO(max_size)
-        self._lock = Lock()
-        self._receiver_positions = {}
+        self.size = size
+        self.lock = threading.Lock()
+        self.shm = shared_memory.SharedMemory(create=True, size=size, name=shm_name)
+        self.buffer = self.shm.buf
+        self.write_index = 0
+        self.total_written = 0  # Used for tracking wrap-arounds
 
-    def update(self, new_data: bytes):
-        n = len(new_data)
-        if n > self.max_size:
-            raise ValueError(f"Data too large for ring buffer: {n} > {self.max_size}")
-        with self._lock:
-            self.byte_stream.write(new_data)
-            self.byte_stream.flush()
-            # Reset all receiver positions to 0 if buffer was truncated
-            for receiver in self._receiver_positions:
-                if self.byte_stream.tell() < self._receiver_positions[receiver]:
-                    # logging.error(f"ByteSender: resetting receiver {id(receiver)} position to 0 due to truncation")
-                    self._receiver_positions[receiver] = 0
+    def update(self, data: bytes):
+        with self.lock:
+            for byte in data:
+                self.buffer[self.write_index % self.size] = byte
+                self.write_index = (self.write_index + 1) % self.size
+                self.total_written += 1
+
+    def read_last(self, length=None):
+        if length is None:
+            length = self.size
+        with self.lock:
+            if length > self.size:
+                raise ValueError("Requested length exceeds buffer capacity")
+
+            start = (self.write_index - length) % self.size
+            if start < self.write_index:
+                return bytes(self.buffer[start:self.write_index])
+            else:
+                return bytes(self.buffer[start:]) + bytes(self.buffer[:self.write_index])
 
     def register_receiver(self, receiver):
-        with self._lock:
-            self._receiver_positions[receiver] = 0
-        logging.info(f"ByteSender.register_receiver: Registered receiver {id(receiver)}.")
         super().register_receiver(receiver)
 
     def unregister_receiver(self, receiver):
-        with self._lock:
-            if receiver in self._receiver_positions:
-                del self._receiver_positions[receiver]
-        logging.info(f"ByteSender.unregister_receiver: Unregistered receiver {id(receiver)}.")
         super().unregister_receiver(receiver)
 
-    def get_receiver_stream(self, receiver):
-        """Return a view of the stream for the receiver, starting at its last read position."""
-        pos = self._receiver_positions.get(receiver, 0)
-        self.byte_stream.seek(pos)
-        data = self.byte_stream.read()
-        self._receiver_positions[receiver] = self.byte_stream.tell()
-        logging.error(f"Position for receiver {id(receiver)} updated to {self._receiver_positions[receiver]}.")
-        # logging.info(f"ByteSender.get_receiver_stream: Receiver {id(receiver)} read {len(data)} bytes from position {pos}.")
-        return data
-
     def close(self):
-        self.byte_stream.close()
+        self.shm.close()
+        self.shm.unlink()
+        del self.shm

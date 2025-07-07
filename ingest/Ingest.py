@@ -7,11 +7,9 @@ from shared.shared_memory.Sender import Sender
 
 class Ingests(DataSender):
     def __init__(self):
-        logging.debug("Initializing ingest")
-
+        logging.info("Initializing ingest")
         self.ingestors = self._instantiate_ingestors()
         self.data_senders: dict[str, Sender] = self._get_all_data_senders()
-        logging.debug("Audio ingest initialized")
 
     def _instantiate_ingestors(self):
         ingestors = []

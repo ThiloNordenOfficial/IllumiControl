@@ -22,4 +22,4 @@ class Runner(StatisticWriter):
     def run_procedure(self):
         pass
 
-    extract = abstractmethod(run_procedure)
+    abstractmethod(run_procedure)

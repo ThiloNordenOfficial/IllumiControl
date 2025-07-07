@@ -10,7 +10,7 @@ class RGBGenerator(GeneratorBase):
     def __init__(self, inbound_data_senders, height: int, width: int, depth: int):
         super().__init__(inbound_data_senders, height, width, depth)
         self.shape = (height, width, depth, 3)
-        self.data_receiver = NumpyArrayReceiver(inbound_data_senders.get("audio-data"))
+        self.data_receiver = NumpyArrayReceiver(inbound_data_senders.get("npa-audio-data"))
         self.rgb_data_sender = NumpyArraySender(self.shape, np.uint8)
         self.outbound_data_senders = {
             "RGB-image": self.rgb_data_sender

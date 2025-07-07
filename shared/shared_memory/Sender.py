@@ -1,3 +1,4 @@
+import logging
 from abc import abstractmethod, ABC
 from typing import final, TypeVar, Generic, TYPE_CHECKING, Type, cast
 
@@ -42,8 +43,10 @@ class Sender(Generic[T]):
 
     def register_receiver(self, receiver: 'Receiver'):
         if receiver not in self.receivers:
+            logging.debug(f"{self.__class__.__name__}.register_receiver: Registered receiver {id(receiver)}.")
             self.receivers.append(receiver)
 
     def unregister_receiver(self, receiver: 'Receiver'):
         if receiver in self.receivers:
+            logging.debug(f"{self.__class__.__name__}.unregister_receiver: Unregistered receiver {id(receiver)}.")
             self.receivers.remove(receiver)

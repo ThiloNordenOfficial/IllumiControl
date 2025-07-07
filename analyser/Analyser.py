@@ -8,10 +8,9 @@ from shared.shared_memory.Sender import Sender
 
 class Analyser(DataSender):
     def __init__(self, data_senders: dict[str, Sender]):
-        logging.debug("Initializing audio analysers")
+        logging.info("Initializing audio analysers")
         self.analysers = self._instantiate_analysers(data_senders)
         self.data_senders: dict[str, Sender] = self._get_all_data_senders(data_senders)
-        logging.debug("Analysers initialized")
 
     @staticmethod
     def _instantiate_analysers(data_senders) -> list[AnalyserBase]:

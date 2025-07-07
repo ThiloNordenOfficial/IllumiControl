@@ -49,9 +49,6 @@ class NumpyArraySender(Sender[np.ndarray]):
             self.condition.notify_all()
 
     def close(self):
-        """
-        Closes and unlinks the shared memory.
-        """
         self.shm.close()
         self.shm.unlink()
         del self.shm

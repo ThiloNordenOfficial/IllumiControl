@@ -2,7 +2,6 @@ from abc import abstractmethod
 
 from shared import DataSender
 from shared.runner.Runner import Runner
-from shared.shared_memory.NumpyArraySender import NumpyArraySender
 from shared.shared_memory.Sender import Sender
 
 

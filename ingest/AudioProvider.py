@@ -1,6 +1,8 @@
 import argparse
+import asyncio
 import logging
 import math
+from multiprocessing import Process
 from typing import Mapping
 
 import pyaudio
@@ -12,7 +14,7 @@ from shared.shared_memory.ByteSender import ByteSender
 from shared.shared_memory.Sender import Sender
 
 
-class AudioProvider(IngestBase, CommandLineArgumentAdder):
+class AudioProvider(IngestBase, CommandLineArgumentAdder, GracefulKiller):
     list_audio_devices = None
     audio_device = None
     sample_rate = None
@@ -30,17 +32,30 @@ class AudioProvider(IngestBase, CommandLineArgumentAdder):
         self.p = pyaudio.PyAudio()
         self.device_index: int = AudioProvider.audio_device \
             if AudioProvider.audio_device is not None else self.p.get_default_input_device_info()['index']
-        self.sample_rate: int = AudioProvider.sample_rate \
+        type(self).sample_rate: int = AudioProvider.sample_rate \
             if AudioProvider.sample_rate is not None else self.detect_sample_rate()
-        self.chunk_size: int = AudioProvider.chunk_size \
+        type(self).chunk_size: int = AudioProvider.chunk_size \
             if AudioProvider.chunk_size is not None else self.detect_chunk_size()
-        self.channels: int = AudioProvider.channels if AudioProvider.channels is not None else 1
+        type(self).channels: int = AudioProvider.channels if AudioProvider.channels is not None else 1
         self.dtype = pyaudio.paInt32
-        self._max_buffer_size = AudioProvider.audio_buffer_size \
-            if AudioProvider.audio_buffer_size is not None else self.sample_rate * 30 # Default to 30 seconds of audio buffer
-        self.raw_audio_data_sender = ByteSender(self._max_buffer_size)
+        type(self).audio_buffer_size = AudioProvider.audio_buffer_size \
+            if AudioProvider.audio_buffer_size is not None else self.sample_rate * 30  # Default to 30 seconds of audio buffer
+        self.raw_audio_data_sender = ByteSender(self.audio_buffer_size)
+        self.stream = self.p.open(
+            format=self.dtype,
+            channels=self.channels,
+            rate=self.sample_rate,
+            input=True,
+            output=False,
+            frames_per_buffer=self.chunk_size,
+            input_device_index=self.device_index,
+            stream_callback=self.write_audio_to_memory,
+        )
 
     def delete(self):
+        logging.info("AudioProvider.delete: Closing audio stream and sender")
+        self.stream.stop_stream()
+        self.stream.close()
         self.raw_audio_data_sender.close()
 
     def detect_sample_rate(self) -> int:
@@ -51,29 +66,17 @@ class AudioProvider(IngestBase, CommandLineArgumentAdder):
             return int(math.floor(detected_sample_rate))
 
     def detect_chunk_size(self) -> int:
-        # TODO Operation to adjust to updates per second
-        logging.debug(f"Detected sample rate: {self.sample_rate}")
-        return self.detect_sample_rate()
+        return int(math.floor(self.sample_rate))
 
     def run(self):
-        self.p.open(
-            format=self.dtype,
-            channels=self.channels,
-            rate=self.sample_rate,
-            input=True,
-            output=False,
-            frames_per_buffer=self.chunk_size,
-            input_device_index=self.device_index,
-            stream_callback=self.write_audio_to_memory,
-            start=True,
-        )
+        self.stream.start_stream()
+
 
     def write_audio_to_memory(self, in_data: bytes | None, frame_count: int, time_info: Mapping[str, float],
                               status: int) -> \
             tuple[bytes | None, int] | None:
-        if in_data is not None:
-            self.raw_audio_data_sender.update(in_data)
-        return in_data, pyaudio.paAbort if GracefulKiller.kill_event.is_set() else pyaudio.paContinue
+        self.raw_audio_data_sender.update(in_data)
+        return None, pyaudio.paAbort if self.kill_event.is_set() else pyaudio.paContinue
 
     def get_outbound_data_senders(self) -> dict[str, Sender]:
         return {

@@ -15,7 +15,7 @@ class Generators(CommandLineArgumentAdder, DataSender):
     depth = None
 
     def __init__(self, data_senders: dict[str, NumpyArraySender]):
-        logging.debug("Initializing image generator")
+        logging.info("Initializing image generator")
         self.generators = self._instantiate_generators(data_senders)
         self.data_senders: dict[str, NumpyArraySender] = self._get_all_data_senders()
 
@@ -32,7 +32,7 @@ class Generators(CommandLineArgumentAdder, DataSender):
         return combined_senders
 
     def run(self):
-        logging.debug("Starting image generator run loop")
+        logging.debug("Starting generator run loop")
         generator_processes = []
         for generator in self.generators:
             generator_processes.append(Process(target=generator.run))

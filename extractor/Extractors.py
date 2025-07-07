@@ -18,11 +18,11 @@ class Extractors(CommandLineArgumentAdder):
     artnet_ip = None
 
     def __init__(self, data_senders: dict[str, NumpyArraySender]):
+        logging.info("Initializing feature extractor")
         self.fixtures = FixtureConfigurationLoader(self.fixture_config).fixtures
         self.dmx_queue = Queue("/dmx_queue")
         self.dmx_sender = DmxConverterUser(data_senders, self.artnet_ip, fixtures=self.fixtures)
         self.extractors = self._instantiate_extractors(data_senders)
-        logging.debug("Initializing feature extractor")
 
     def _instantiate_extractors(self, data_senders) -> list[ExtractorBase]:
         extractors = []

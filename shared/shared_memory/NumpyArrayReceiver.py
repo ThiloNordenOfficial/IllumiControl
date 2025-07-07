@@ -14,9 +14,8 @@ class NumpyArrayReceiver(Receiver[NumpyArraySender]):
     for updates using a shared Condition. When an update occurs, it returns the updated array.
     """
 
-    def __init__(self, sender: Sender):
+    def __init__(self, sender: NumpyArraySender):
         super().__init__(sender, NumpyArraySender)
-
         self.shape = sender.shape
         self.dtype = np.dtype(sender.dtype)
         self.data_size = np.prod(self.shape) * self.dtype.itemsize
@@ -49,4 +48,6 @@ class NumpyArrayReceiver(Receiver[NumpyArraySender]):
         """
         Closes the shared memory connection.
         """
+        self.sender.unregister_receiver(self)
         self.shm.close()
+        del self
