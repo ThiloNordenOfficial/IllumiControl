@@ -1,8 +1,5 @@
 import logging
 import threading
-from multiprocessing import Process
-
-from ingest.AudioProvider import AudioProvider
 from ingest.IngestBase import IngestBase
 from shared import DataSender
 from shared.shared_memory.Sender import Sender
@@ -11,7 +8,6 @@ from shared.shared_memory.Sender import Sender
 class Ingests(DataSender):
     def __init__(self):
         logging.debug("Initializing ingest")
-        self.audio_provider = AudioProvider()
 
         self.ingestors = self._instantiate_ingestors()
         self.data_senders: dict[str, Sender] = self._get_all_data_senders()
@@ -33,7 +29,7 @@ class Ingests(DataSender):
         logging.debug("Starting ingest run loop")
         ingest_threads = []
         for ingestor in self.ingestors:
-            ingest_threads.append(threading.Thread(target=ingestor))
+            ingest_threads.append(threading.Thread(target=ingestor.run))
 
         for ingestor in ingest_threads:
             ingestor.start()

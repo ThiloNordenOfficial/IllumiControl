@@ -24,7 +24,6 @@ class Analyser(DataSender):
         combined_senders = data_senders
         for analyser in self.analysers:
             combined_senders.update(analyser.get_outbound_data_senders())
-        logging.error("Analyser data senders: %s", combined_senders)
         return combined_senders
 
     def run(self):

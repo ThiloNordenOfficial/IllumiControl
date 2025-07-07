@@ -1,5 +1,6 @@
 import argparse
 import logging
+from asyncio import timeout
 
 import numpy as np
 import opensmile
@@ -36,7 +37,7 @@ class OpenSmileAnalyser(AnalyserBase, CommandLineArgumentAdder):
 
     def digest(self) -> np.ndarray:
         value = self.raw_audio_data_receiver.read_new()
-        logging.error(value)
+        # logging.error(value)
         # if not value:
         #     logging.warning("No data received from raw audio data receiver")
         return np.array([])

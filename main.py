@@ -58,7 +58,6 @@ class IllumiControl:
         self.analysers = Analyser(self.data_senders)
         self.data_senders.update(self.analysers.get_outbound_data_senders())
 
-        logging.error(self.data_senders)
         self.generators = Generators(self.data_senders)
         self.data_senders.update(self.generators.get_outbound_data_senders())
 
