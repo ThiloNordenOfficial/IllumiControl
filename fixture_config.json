@@ -1,10 +1,10 @@
 {
   "universes": [
     {
-      "id": 1,
+      "id": 0,
       "fixtures": [
         {
-          "id": 1,
+          "id": 0,
           "type": "PAR",
           "dmx_addresses": [
             {
@@ -27,7 +27,7 @@
           ]
         },
         {
-          "id": 2,
+          "id": 1,
           "type": "PAR",
           "dmx_addresses": [
             {

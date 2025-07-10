@@ -40,7 +40,7 @@ def verify_dmx_address(dmx_address):
             raise ValueError("DMX addresses not continuous")
 
     # check if any ChannelTypes are duplicated
-    if len(dmx_address) != len(set([x[1] for x in dmx_address])):
+    if len(dmx_address) != len({x[1] for x in dmx_address}):
         raise ValueError("Duplicate ChannelTypes")
 
     # check if all ChannelTypes are valid
@@ -75,5 +75,5 @@ def verify_position(position):
 
 
 def verify_universe(dmx_universe):
-    if not 1 <= int(dmx_universe) <= 512:
-        raise ValueError("Universe must be a number between 1 and 512")
+    if not 0 <= int(dmx_universe) <= 512:
+        raise ValueError("Universe must be a number between 0 and 512")

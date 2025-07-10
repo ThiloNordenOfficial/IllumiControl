@@ -9,14 +9,14 @@ from shared import TimingReceiver, DmxQueueUser
 from shared.shared_memory.NumpyArraySender import NumpyArraySender
 
 
-class DmxConverterUser(TimingReceiver, DmxQueueUser):
+class DmxSender(TimingReceiver, DmxQueueUser):
     def __init__(self, inbound_data_senders: dict[str, NumpyArraySender], artnet_server_ip, fixtures: list[Fixture]):
         TimingReceiver.__init__(self, inbound_data_senders)
         DmxQueueUser.__init__(self)
 
         self.senders = []
         self.fixtures_in_universe: dict[int, Set[Fixture]] = {}
-        for universe in set([fixture.dmx_universe for fixture in fixtures]):
+        for universe in {fixture.dmx_universe for fixture in fixtures}:
             self.senders.append(
                 StupidArtnet(universe=universe, target_ip=artnet_server_ip, broadcast=True, artsync=True))
             fixtures_in_universe = [fixture for fixture in fixtures if fixture.dmx_universe == universe]

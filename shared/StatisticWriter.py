@@ -11,11 +11,11 @@ from shared.validators.is_valid_file import is_valid_file
 
 class StatisticWriter(GracefulKiller, CommandLineArgumentAdder):
     statistics_are_active: bool = False
+    path = None
 
     def __init__(self):
         self._name = self.__class__.__name__
-        logging.error(
-            f"Initializing StatisticWriter for {self._name} with statistics active: {self.statistics_are_active}")
+        self.path = self.path if self.path is not None else os.path.join(os.getcwd(), "statistics")
         if self.statistics_are_active:
             logging.error(f"Statistics are active for {self._name}. Setting up file handle.")
             self._file_handle: TextIO = self._setup_statistics()
@@ -24,9 +24,12 @@ class StatisticWriter(GracefulKiller, CommandLineArgumentAdder):
         self._file_handle.close()
 
     def _setup_statistics(self):
+        os.makedirs(self.path, exist_ok=True)
         file_name = f"{self._name}.statistic.log"
-        file_path = os.path.join("statistics", file_name)
-        return open(file_path, 'a')
+        file_path = os.path.join(self.path, file_name)
+        if os.path.exists(file_path):
+            os.remove(file_path)
+        return open(file_path, 'x')
 
     def write_statistics(self, data):
         if self.statistics_are_active:
@@ -35,12 +38,12 @@ class StatisticWriter(GracefulKiller, CommandLineArgumentAdder):
 
     @staticmethod
     def add_command_line_arguments(parser: argparse) -> argparse:
-        parser.add_argument("-stats", "--statistics", dest='statistics', type=bool, default=False,
+        parser.add_argument("-stats", "--statistics", dest='statistics', default='False',
                             help="Enable writing statistics of extractors to file")
-        parser.add_argument("-stats-path", "--statistics-path", dest='statistics_path', default="statistics",
-                            type=lambda x: is_valid_file(parser, x), help="Path to the statistics folder")
+        parser.add_argument("-stats-path", "--statistics-path", dest='statistics_path', help="Path to the statistics folder")
         return parser
 
     @classmethod
     def apply_command_line_arguments(cls, args: argparse.Namespace):
-        cls.statistics_are_active = args.statistics
+        cls.statistics_are_active = args.statistics is not None and args.statistics == 'True'
+        cls.path = args.statistics_path
