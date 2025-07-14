@@ -16,11 +16,8 @@ class FixtureConfigurationLoader:
         with open(self.file_path, 'r') as file:
             self.configuration = json.load(file)
 
-    def get_configuration(self):
-        return self.configuration
-
-    def load_fixtures_from_configuration(self) -> [Fixture]:
-        config = self.get_configuration()
+    def load_fixtures_from_configuration(self) -> list[Fixture]:
+        config = self.configuration
         fixtures = []
         config_universes = config['universes']
         for config_universe in config_universes:

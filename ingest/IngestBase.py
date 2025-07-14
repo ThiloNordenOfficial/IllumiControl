@@ -1,7 +1,7 @@
 from abc import abstractmethod
 
 from shared import DataSender
-from shared.shared_memory.Sender import Sender
+from shared.shared_memory.SmSender import SmSender
 
 
 class IngestBase(DataSender):
@@ -10,6 +10,6 @@ class IngestBase(DataSender):
         super().__init__()
 
     @abstractmethod
-    def get_outbound_data_senders(self) -> dict[str, Sender]:
+    def get_outbound_data_senders(self) -> dict[str, SmSender]:
         pass
     abstractmethod(get_outbound_data_senders)

@@ -12,3 +12,4 @@ from shared.runner.TimedRunner import TimedRunner
 from .DataSender import DataSender
 from .fixture import *
 from .shared_memory import *
+from .validators import *

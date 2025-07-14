@@ -1,6 +1,5 @@
 import argparse
 import logging
-from asyncio import timeout
 
 import numpy as np
 import opensmile
@@ -11,14 +10,14 @@ from ingest import AudioProvider
 from shared.CommandLineArgumentAdder import CommandLineArgumentAdder
 from shared.shared_memory.ByteReceiver import ByteReceiver
 from shared.shared_memory.NumpyArraySender import NumpyArraySender
-from shared.shared_memory.Sender import Sender
+from shared.shared_memory.SmSender import SmSender
 from shared.validators.is_valid_file import is_valid_file
 
 
 class OpenSmileAnalyser(AnalyserBase, CommandLineArgumentAdder):
     feature_set = None
 
-    def __init__(self, inbound_data_senders: dict[str, Sender]):
+    def __init__(self, inbound_data_senders: dict[str, SmSender]):
         self.timing_sender = NumpyArraySender(shape=np.shape(np.array([1.])), dtype=np.float64)
         inbound_data_senders.update([("npa-timing-data", self.timing_sender)])
         super().__init__(inbound_data_senders)
@@ -30,7 +29,7 @@ class OpenSmileAnalyser(AnalyserBase, CommandLineArgumentAdder):
         self.audio_data_sender = NumpyArraySender(shape=(1, self.smile.num_features),
                                                   dtype=np.float64)
 
-    def run_procedure(self):
+    async def run_procedure(self):
         audio_data = self.digest()
         self.audio_data_sender.update(audio_data)
 
@@ -54,7 +53,7 @@ class OpenSmileAnalyser(AnalyserBase, CommandLineArgumentAdder):
         self.audio_data_sender.close()
         del self.smile
 
-    def get_outbound_data_senders(self) -> dict[str, Sender]:
+    def get_outbound_data_senders(self) -> dict[str, SmSender]:
         return {
             "npa-timing-data": self.timing_sender,
             "npa-audio-data": self.audio_data_sender

@@ -1,0 +1,2 @@
+class PostProcessorBase:
+    pass

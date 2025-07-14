@@ -1,10 +1,10 @@
 import numpy as np
 from multiprocessing import shared_memory, Condition
 
-from shared.shared_memory.Sender import Sender
+from shared.shared_memory.SmSender import SmSender
 
 
-class NumpyArraySender(Sender[np.ndarray]):
+class NumpyArraySender(SmSender[np.ndarray]):
     """
     DataSender creates a shared memory block where a NumPy array along with a version number
     is stored. A Condition is used to notify receivers when an update occurs.

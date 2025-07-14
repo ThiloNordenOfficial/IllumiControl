@@ -4,11 +4,11 @@ import numpy as np
 from multiprocessing import shared_memory
 
 from shared.shared_memory.NumpyArraySender import NumpyArraySender
-from shared.shared_memory.Receiver import Receiver
-from shared.shared_memory.Sender import Sender
+from shared.shared_memory.SmReceiver import SmReceiver
+from shared.shared_memory.SmSender import SmSender
 
 
-class NumpyArrayReceiver(Receiver[NumpyArraySender]):
+class NumpyArrayReceiver(SmReceiver[NumpyArraySender]):
     """
     DataReceiver connects to the shared memory block created by DataSender and waits
     for updates using a shared Condition. When an update occurs, it returns the updated array.

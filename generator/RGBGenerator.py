@@ -3,7 +3,7 @@ import numpy as np
 from generator.GeneratorBase import GeneratorBase
 from shared.shared_memory.NumpyArrayReceiver import NumpyArrayReceiver
 from shared.shared_memory.NumpyArraySender import NumpyArraySender
-from shared.shared_memory.Sender import Sender
+from shared.shared_memory.SmSender import SmSender
 
 
 class RGBGenerator(GeneratorBase):
@@ -22,10 +22,10 @@ class RGBGenerator(GeneratorBase):
         for sender in self.outbound_data_senders.values():
             sender.close()
 
-    def run_procedure(self):
+    async def run_procedure(self):
         audio_data = self.data_receiver.read_on_update()
         image = np.random.randint(0, 256, self.shape, dtype=np.uint8)
         self.rgb_data_sender.update(image)
 
-    def get_outbound_data_senders(self) -> dict[str, Sender]:
+    def get_outbound_data_senders(self) -> dict[str, SmSender]:
         return self.outbound_data_senders

@@ -6,7 +6,7 @@ from shared.CommandLineArgumentAdder import CommandLineArgumentAdder
 from generator.GeneratorBase import GeneratorBase
 from shared import DataSender
 from shared.shared_memory.NumpyArraySender import NumpyArraySender
-from shared.shared_memory.Sender import Sender
+from shared.shared_memory.SmSender import SmSender
 
 
 class Generators(CommandLineArgumentAdder, DataSender):
@@ -59,5 +59,5 @@ class Generators(CommandLineArgumentAdder, DataSender):
         cls.width = args.width
         cls.depth = args.depth
 
-    def get_outbound_data_senders(self) -> dict[str, Sender]:
+    def get_outbound_data_senders(self) -> dict[str, SmSender]:
         return self.data_senders

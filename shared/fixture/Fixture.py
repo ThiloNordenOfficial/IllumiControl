@@ -11,8 +11,8 @@ class Fixture:
         self.fixture_id: int = fixture_id
         self.type: FixtureType = FixtureType(fixture_type)
         self.dmx_universe: int = dmx_universe
-        self.dmx_addresses: [Tuple[int, ChannelType]] = [(addr, ChannelType(ch_type)) for addr, ch_type in
-                                                         dmx_addresses]
+        self.dmx_addresses: list[Tuple[int, ChannelType]] = [(addr, ChannelType(ch_type)) for addr, ch_type in
+                                                             dmx_addresses]
         self.position: Tuple[int, int, int] = position
 
     def __str__(self):

@@ -12,14 +12,14 @@ class Runner(StatisticWriter):
     async def _run_until_shutdown(self):
         while not self.kill_event.is_set():
             start_time = time.time()
-            self.run_procedure()
+            await self.run_procedure()
             if self.statistics_are_active:
                 self.write_statistics(time.time() - start_time)
         self.delete()
 
 
     @abstractmethod
-    def run_procedure(self):
+    async def run_procedure(self):
         pass
 
     abstractmethod(run_procedure)

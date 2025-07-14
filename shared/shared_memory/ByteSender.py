@@ -1,10 +1,10 @@
 import threading
 from multiprocessing import shared_memory
-from shared.shared_memory.Sender import Sender, T
+from shared.shared_memory.SmSender import SmSender, T
 import logging
 
 
-class ByteSender(Sender[bytes]):
+class ByteSender(SmSender[bytes]):
     def __init__(self, size, shm_name=None):
         super().__init__()
         self.size = size

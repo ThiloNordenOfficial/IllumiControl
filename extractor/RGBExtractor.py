@@ -1,9 +1,10 @@
+import asyncio
+
 from extractor.ExtractorBase import ExtractorBase
 from shared.fixture import ChannelType as ct
 from shared.DmxChannelValue import DmxChannelValue
 from shared.shared_memory.NumpyArrayReceiver import NumpyArrayReceiver
-from shared.shared_memory.NumpyArraySender import NumpyArraySender
-from shared.shared_memory.Sender import Sender
+from shared.shared_memory.SmSender import SmSender
 
 
 class RGBExtractor(ExtractorBase):
@@ -19,11 +20,15 @@ class RGBExtractor(ExtractorBase):
         self.rgb_data_receiver.close()
         del self.relevant_fixtures
 
-    def get_outbound_data_senders(self) -> dict[str, Sender]:
+    def get_outbound_data_senders(self) -> dict[str, SmSender]:
         return {}
 
-    def run_procedure(self):
+    async def run_procedure(self):
         rbg_data = self.rgb_data_receiver.read_on_update()
+        if self.complexity >= 20:
+            await asyncio.sleep(1.5)
+        else:
+            await asyncio.sleep(0.5)
         dmx_frame = []
         for fixture in self.relevant_fixtures:
             rgb_values = rbg_data[fixture.position[0], fixture.position[1], fixture.position[2]]

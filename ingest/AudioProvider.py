@@ -11,7 +11,7 @@ from ingest.IngestBase import IngestBase
 from shared import GracefulKiller
 from shared.CommandLineArgumentAdder import CommandLineArgumentAdder
 from shared.shared_memory.ByteSender import ByteSender
-from shared.shared_memory.Sender import Sender
+from shared.shared_memory.SmSender import SmSender
 
 
 class AudioProvider(IngestBase, CommandLineArgumentAdder, GracefulKiller):
@@ -78,7 +78,7 @@ class AudioProvider(IngestBase, CommandLineArgumentAdder, GracefulKiller):
         self.raw_audio_data_sender.update(in_data)
         return None, pyaudio.paAbort if self.kill_event.is_set() else pyaudio.paContinue
 
-    def get_outbound_data_senders(self) -> dict[str, Sender]:
+    def get_outbound_data_senders(self) -> dict[str, SmSender]:
         return {
             "b-raw-audio-data": self.raw_audio_data_sender,
         }

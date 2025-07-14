@@ -1,18 +1,18 @@
 import logging
-from abc import abstractmethod, ABC
+from abc import abstractmethod
 from typing import final, TypeVar, Generic, TYPE_CHECKING, Type, cast
 
 
 T = TypeVar('T')
-S = TypeVar('S', bound='Sender')
+S = TypeVar('S', bound='SmSender')
 
 if TYPE_CHECKING:
-    from shared.shared_memory.Receiver import Receiver
+    from shared.shared_memory.SmReceiver import SmReceiver
 
 
-class Sender(Generic[T]):
+class SmSender(Generic[T]):
     def __init__(self):
-        self.receivers: list['Receiver'] = []
+        self.receivers: list['SmReceiver'] = []
 
     @abstractmethod
     def close(self):
@@ -41,12 +41,12 @@ class Sender(Generic[T]):
             receiver.delete()
         self.close()
 
-    def register_receiver(self, receiver: 'Receiver'):
+    def register_receiver(self, receiver: 'SmReceiver'):
         if receiver not in self.receivers:
             logging.debug(f"{self.__class__.__name__}.register_receiver: Registered receiver {id(receiver)}.")
             self.receivers.append(receiver)
 
-    def unregister_receiver(self, receiver: 'Receiver'):
+    def unregister_receiver(self, receiver: 'SmReceiver'):
         if receiver in self.receivers:
             logging.debug(f"{self.__class__.__name__}.unregister_receiver: Unregistered receiver {id(receiver)}.")
             self.receivers.remove(receiver)

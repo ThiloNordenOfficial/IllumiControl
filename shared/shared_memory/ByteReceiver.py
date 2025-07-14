@@ -1,10 +1,10 @@
 from shared.shared_memory.ByteSender import ByteSender
-from shared.shared_memory.Receiver import Receiver
-from shared.shared_memory.Sender import Sender
+from shared.shared_memory.SmReceiver import SmReceiver
+from shared.shared_memory.SmSender import SmSender
 
 
-class ByteReceiver(Receiver[ByteSender]):
-    def __init__(self, sender: Sender):
+class ByteReceiver(SmReceiver[ByteSender]):
+    def __init__(self, sender: SmSender):
         super().__init__(sender, ByteSender)
 
     def read(self, size: int) -> bytes:

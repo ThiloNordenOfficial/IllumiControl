@@ -2,14 +2,14 @@ import logging
 import threading
 from ingest.IngestBase import IngestBase
 from shared import DataSender
-from shared.shared_memory.Sender import Sender
+from shared.shared_memory.SmSender import SmSender
 
 
 class Ingests(DataSender):
     def __init__(self):
         logging.info("Initializing ingest")
         self.ingestors = self._instantiate_ingestors()
-        self.data_senders: dict[str, Sender] = self._get_all_data_senders()
+        self.data_senders: dict[str, SmSender] = self._get_all_data_senders()
 
     def _instantiate_ingestors(self):
         ingestors = []
@@ -17,7 +17,7 @@ class Ingests(DataSender):
             ingestors.append(ingestor_class())
         return ingestors
 
-    def _get_all_data_senders(self) -> dict[str, Sender]:
+    def _get_all_data_senders(self) -> dict[str, SmSender]:
         combined_senders = {}
         for ingestor in self.ingestors:
             combined_senders.update(ingestor.get_outbound_data_senders())
@@ -35,5 +35,5 @@ class Ingests(DataSender):
         for ingestor in ingest_threads:
             ingestor.join()
 
-    def get_outbound_data_senders(self) -> dict[str, Sender]:
+    def get_outbound_data_senders(self) -> dict[str, SmSender]:
         return self.data_senders

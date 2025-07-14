@@ -3,14 +3,14 @@ from multiprocessing import Process
 
 from analyser.AnalyserBase import AnalyserBase
 from shared import DataSender
-from shared.shared_memory.Sender import Sender
+from shared.shared_memory.SmSender import SmSender
 
 
-class Analyser(DataSender):
-    def __init__(self, data_senders: dict[str, Sender]):
+class Analysers(DataSender):
+    def __init__(self, data_senders: dict[str, SmSender]):
         logging.info("Initializing audio analysers")
         self.analysers = self._instantiate_analysers(data_senders)
-        self.data_senders: dict[str, Sender] = self._get_all_data_senders(data_senders)
+        self.data_senders: dict[str, SmSender] = self._get_all_data_senders(data_senders)
 
     @staticmethod
     def _instantiate_analysers(data_senders) -> list[AnalyserBase]:
@@ -19,7 +19,7 @@ class Analyser(DataSender):
             analysers.append(analyser_class(data_senders))
         return analysers
 
-    def _get_all_data_senders(self, data_senders: dict[str, Sender]) -> dict[str, Sender]:
+    def _get_all_data_senders(self, data_senders: dict[str, SmSender]) -> dict[str, SmSender]:
         combined_senders = data_senders
         for analyser in self.analysers:
             combined_senders.update(analyser.get_outbound_data_senders())
@@ -37,5 +37,5 @@ class Analyser(DataSender):
         for process in analyser_processes:
             process.join()
 
-    def get_outbound_data_senders(self) -> dict[str, Sender]:
+    def get_outbound_data_senders(self) -> dict[str, SmSender]:
         return self.data_senders

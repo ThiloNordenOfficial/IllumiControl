@@ -4,12 +4,11 @@ from shared import TimingReceiver, StatisticWriter, DataSender, DmxQueueUser, Ti
 from shared.shared_memory.NumpyArraySender import NumpyArraySender
 
 
-class ExtractorBase(TimingReceiver, DmxQueueUser, DataSender, TimedRunner):
+class ExtractorBase(DmxQueueUser, DataSender, TimedRunner):
     def __init__(self, inbound_data_senders: dict[str, NumpyArraySender], fixtures):
-        TimingReceiver.__init__(self, inbound_data_senders)
+        TimedRunner.__init__(self, inbound_data_senders)
         DmxQueueUser.__init__(self)
         StatisticWriter.__init__(self)
-
         self.inbound_data_senders = inbound_data_senders
         self.fixtures = fixtures
 
