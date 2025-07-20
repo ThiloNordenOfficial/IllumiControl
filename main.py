@@ -22,7 +22,7 @@ class IllumiControl:
         self.extract = None
         self.post_process = None
         self.send = None
-        self.threads = []
+        self.runners = []
 
     def prepare_commandline_arguments(self) -> argparse.Namespace:
         parser = argparse.ArgumentParser(
@@ -73,7 +73,7 @@ class IllumiControl:
 
         self.send = SendModule(self.data_senders)
 
-    def start_threads(self):
+    def start_runners(self):
         ingest_runner = Process(target=self.ingest.run, name='Ingest')
         analyser_runner = Process(target=self.analyse.run, name='Analyse')
         generator_runner = Process(target=self.generate.run, name='Generate')
@@ -81,15 +81,15 @@ class IllumiControl:
         post_processor_runner = Process(target=self.post_process.run, name='PostProcess')
         sender_runner = Process(target=self.send.run, name='Send')
 
-        self.threads = [ingest_runner, analyser_runner, generator_runner, extractor_runner,
+        self.runners = [ingest_runner, analyser_runner, generator_runner, extractor_runner,
                         post_processor_runner,
                         sender_runner]
-        for thread in self.threads:
-            thread.start()
+        for runner in self.runners:
+            runner.start()
 
-    def join_threads(self):
-        for thread in self.threads:
-            thread.join()
+    def join_runners(self):
+        for runner in self.runners:
+            runner.join()
 
     def run(self):
         self.setup_graceful_shutdown()
@@ -98,9 +98,8 @@ class IllumiControl:
         LoggingConfigurator()
 
         self.initialize_components()
-        self.start_threads()
-
-        self.join_threads()
+        self.start_runners()
+        self.join_runners()
 
         logging.warning("Graceful shutdown of IllumiControl completed")
 
