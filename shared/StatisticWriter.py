@@ -17,7 +17,6 @@ class StatisticWriter(GracefulKiller, CommandLineArgumentAdder):
         self._name = self.__class__.__name__
         self.path = self.path if self.path is not None else os.path.join(os.getcwd(), "statistics")
         if self.statistics_are_active:
-            logging.error(f"Statistics are active for {self._name}. Setting up file handle.")
             self._file_handle: TextIO = self._setup_statistics()
 
     def delete(self):
