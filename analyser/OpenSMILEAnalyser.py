@@ -6,6 +6,7 @@ import opensmile
 from opensmile import FeatureLevel
 
 from analyser.AnalyserBase import AnalyserBase
+from analyser.TimingProviderBase import TimingProviderBase
 from ingest import AudioProvider
 from shared.CommandLineArgumentAdder import CommandLineArgumentAdder
 from shared.shared_memory.ByteReceiver import ByteReceiver
@@ -14,7 +15,7 @@ from shared.shared_memory.SmSender import SmSender
 from shared.validators.is_valid_file import is_valid_file
 
 
-class OpenSmileAnalyser(AnalyserBase, CommandLineArgumentAdder):
+class OpenSmileAnalyser(TimingProviderBase, CommandLineArgumentAdder):
     feature_set = None
 
     def __init__(self, inbound_data_senders: dict[str, SmSender]):
@@ -44,7 +45,7 @@ class OpenSmileAnalyser(AnalyserBase, CommandLineArgumentAdder):
                 dtype=int
             ), AudioProvider.sample_rate
         ).to_numpy()
-        self.timing_sender.update(np.array([1]))
+        self.timing_sender.update(np.array([1 / self.fps]))
         return signal
 
     def delete(self):

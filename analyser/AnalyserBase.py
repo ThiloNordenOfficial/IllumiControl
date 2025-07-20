@@ -2,10 +2,11 @@ from abc import abstractmethod
 
 from shared import DataSender
 from shared.runner.Runner import Runner
+from shared.runner.TimedRunner import TimedRunner
 from shared.shared_memory.SmSender import SmSender
 
 
-class AnalyserBase(DataSender, Runner):
+class AnalyserBase(DataSender, TimedRunner):
     def __init__(self, inbound_data_senders: dict[str, 'SmSender']):
         super().__init__()
         self.inbound_data_senders = inbound_data_senders

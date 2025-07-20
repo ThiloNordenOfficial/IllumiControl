@@ -46,8 +46,8 @@ class TimedRunner(Runner, TimingReceiver):
     @final
     async def _run_until_shutdown(self):
         while not self.kill_event.is_set():
-            start_time = time.time()
             max_time = float(self.timing_receiver.read_on_update()[0])
+            start_time = time.time()
             try:
                 await asyncio.wait_for(self.run_procedure(), timeout=max_time)
                 self.adjust_complexity(True)
