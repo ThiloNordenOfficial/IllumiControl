@@ -6,15 +6,15 @@ from typing import final
 
 from shared import TimingReceiver
 from shared.runner.Runner import Runner
-from shared.shared_memory.NumpyArraySender import NumpyArraySender
+from shared.shared_memory import SmSender
 
 
 class TimedRunner(Runner, TimingReceiver):
-    def __init__(self, inbound_data_senders: dict[str, NumpyArraySender]):
+    def __init__(self, inbound_data_senders: dict[str, SmSender]):
         TimingReceiver.__init__(self, inbound_data_senders)
         Runner.__init__(self)
         self.complexity = 1
-        self._max_complexity = 100
+        self._max_complexity = 100000000
         self._times_without_complexity_adjustment = 0
 
     def delete(self):
@@ -51,10 +51,13 @@ class TimedRunner(Runner, TimingReceiver):
             try:
                 await asyncio.wait_for(self.run_procedure(), timeout=max_time)
                 self.adjust_complexity(True)
+                time_taken = time.time() - start_time
+                if self.statistics_are_active:
+                    self.write_statistics(time_taken)
+                await asyncio.sleep(max_time-time_taken)
             except asyncio.TimeoutError:
                 logging.warning(
                     F"Dropped {self.__class__.__name__} step due to not finishing in time ({max_time}s), will adjust complexity")
                 self.adjust_complexity(False)
-            if self.statistics_are_active:
-                self.write_statistics(time.time() - start_time)
+
         self.delete()

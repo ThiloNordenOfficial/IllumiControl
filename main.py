@@ -4,6 +4,7 @@ import signal
 import threading
 
 from analyser.Analysers import Analysers
+from postprocessor.PostProcessors import PostProcessors
 from sender.Senders import Senders
 from shared.CommandLineArgumentAdder import CommandLineArgumentAdder
 from ingest import Ingests
@@ -65,10 +66,11 @@ class IllumiControl:
         self.data_senders.update(self.generators.get_outbound_data_senders())
 
         self.extractors = Extractors(self.data_senders)
+        self.data_senders.update(self.extractors.get_outbound_data_senders())
 
-        # self.post_processors = PostProcessors(self.data_senders)
-        # If postprocessing is done via shared memory, comment this in
-        # self.data_senders.update(self.feature_extractor.get_outbound_data_senders())
+        self.post_processors = PostProcessors(self.data_senders)
+        self.data_senders.update(self.post_processors.get_outbound_data_senders())
+
         self.senders = Senders(self.data_senders)
 
     def start_threads(self):
@@ -76,11 +78,11 @@ class IllumiControl:
         analyser_runner = threading.Thread(target=self.analysers.run)
         generator_runner = threading.Thread(target=self.generators.run)
         extractor_runner = threading.Thread(target=self.extractors.run)
-        # postprocessor_runner = threading.Thread(target=self.post_processors.run)
+        post_processor_runner = threading.Thread(target=self.post_processors.run)
         sender_runner = threading.Thread(target=self.senders.run)
 
         self.threads = [ingest_runner, analyser_runner, generator_runner, extractor_runner,
-                        # postprocessor_runner,
+                        post_processor_runner,
                         sender_runner]
         for thread in self.threads:
             thread.start()

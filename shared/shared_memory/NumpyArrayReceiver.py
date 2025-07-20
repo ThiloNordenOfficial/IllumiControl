@@ -1,11 +1,9 @@
-import time
+from multiprocessing import shared_memory
 
 import numpy as np
-from multiprocessing import shared_memory
 
 from shared.shared_memory.NumpyArraySender import NumpyArraySender
 from shared.shared_memory.SmReceiver import SmReceiver
-from shared.shared_memory.SmSender import SmSender
 
 
 class NumpyArrayReceiver(SmReceiver[NumpyArraySender]):
@@ -14,7 +12,7 @@ class NumpyArrayReceiver(SmReceiver[NumpyArraySender]):
     for updates using a shared Condition. When an update occurs, it returns the updated array.
     """
 
-    def __init__(self, sender: NumpyArraySender):
+    def __init__(self, sender: SmReceiver):
         super().__init__(sender, NumpyArraySender)
         self.shape = sender.shape
         self.dtype = np.dtype(sender.dtype)

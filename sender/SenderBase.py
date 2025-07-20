@@ -1,24 +1,18 @@
 from abc import abstractmethod
 
-from sender.SenderRunner import SenderRunner
-from shared import  DmxQueueUser, Runner
-from shared.fixture.FixtureConsumer import FixtureConsumer
-from shared.shared_memory.SmSender import SmSender
+from shared import NumpyArrayReceiver
+from shared.fixture.DmxSignal import DmxSignal
+from shared.fixture.Fixture import Fixture
 
 
-class SenderBase(DmxQueueUser, SenderRunner, FixtureConsumer):
-
-    def __init__(self, inbound_data_senders: dict[str, SmSender]):
-        DmxQueueUser.__init__(self)
-        SenderRunner.__init__(self,inbound_data_senders)
-        FixtureConsumer.__init__(self)
-
-    def delete(self):
-        DmxQueueUser.delete(self)
-        SenderRunner.delete(self)
+class SenderBase():
+    def __init__(self, data_senders: dict[str, 'SmSender'], fixtures: list[Fixture]):
+        super().__init__()
+        self.fixtures = fixtures
+        self.post_processor_finished_receiver = NumpyArrayReceiver(data_senders.get("post_processing_finished"))
 
     @abstractmethod
-    async def run_after_processing(self):
+    def send(self, dmx_values: list[DmxSignal]):
         pass
-    abstractmethod(run_after_processing)
 
+    abstractmethod(send)

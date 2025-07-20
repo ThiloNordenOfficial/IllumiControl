@@ -1,31 +1,41 @@
+import asyncio
 import logging
-import threading
+from multiprocessing import Process
+from threading import Thread
 
 from sender.SenderBase import SenderBase
+from shared import GracefulKiller, NumpyArrayReceiver
+from shared.fixture.DmxSignal import DmxSignal
 from shared.fixture.FixtureConsumer import FixtureConsumer
+from shared.runner.Runner import Runner
 from shared.shared_memory import SmSender
+from shared.shared_memory.QueueReceiver import QueueReceiver
 
 
-class Senders(object):
+class Senders(Runner):
+
     def __init__(self, data_senders: dict[str, SmSender]):
+        super().__init__()
         logging.info("Initializing outbound senders")
         self.fixtures = FixtureConsumer().fixtures
-        self.out_senders = self._instantiate_senders(data_senders)
+        self.senders = self._instantiate_senders(data_senders, self.fixtures)
+        self.post_processing_finished_receiver = NumpyArrayReceiver(data_senders.get('post_processing_finished'))
+        self.dmx_value_queue = QueueReceiver[DmxSignal](data_senders.get('dmx_queue'))
 
-    def _instantiate_senders(self, data_senders) -> list[SenderBase]:
+    def delete(self):
+        super().delete()
+
+    def _instantiate_senders(self, data_senders, fixtures) -> list[SenderBase]:
         senders = []
         for sender_class in SenderBase.__subclasses__():
-            senders.append(sender_class(data_senders))
+            senders.append(sender_class(data_senders, fixtures))
         return senders
 
-    def run(self):
-        logging.debug("Starting sender run loop")
-        sender_threads = []
-        for sender in self.out_senders:
-            sender_threads.append(threading.Thread(target=sender.run))
 
-        for sender in sender_threads:
-            sender.start()
-
-        for sender in sender_threads:
-            sender.join()
+    async def run_procedure (self):
+        self.post_processing_finished_receiver.read_on_update()
+        dmx_values = self.dmx_value_queue.get_all_present()
+        threads = []
+        for sender in self.senders:
+            threads.append(asyncio.to_thread(sender.send, dmx_values))
+        await asyncio.gather(*threads)

@@ -5,11 +5,9 @@ from .shared_memory import NumpyArraySender, NumpyArrayReceiver
 from .ConfigReader import ConfigReader
 from .GracefulKiller import GracefulKiller
 from .TimingReceiver import TimingReceiver
-from .DmxQueueUser import DmxQueueUser
 from .StatisticWriter import StatisticWriter
 from shared.runner.Runner import Runner
 from shared.runner.TimedRunner import TimedRunner
 from .DataSender import DataSender
 from .fixture import *
-from .shared_memory import *
 from .validators import *

@@ -1,39 +1,26 @@
 import argparse
-import asyncio
-import itertools
 import logging
-import time
 from typing import Set
 
 from stupidArtnet import StupidArtnet
 
 from sender.SenderBase import SenderBase
 from shared.fixture import Fixture
-from shared.shared_memory.NumpyArraySender import NumpyArraySender
+from shared.fixture.DmxSignal import DmxSignal
+from shared.shared_memory import SmSender
 from shared.validators.is_valid_ip import is_valid_ip
 
 
 class ArtNetSender(SenderBase):
     artnet_ip = None
 
-    def __init__(self, inbound_data_senders: dict[str, NumpyArraySender]):
-        SenderBase.__init__(self, inbound_data_senders)
+    def __init__(self, data_senders: dict[str, SmSender], fixtures: list):
+        SenderBase.__init__(self, data_senders, fixtures)
         self.artnet_ip = self.artnet_ip if self.artnet_ip is not None else "127.0.0.1"
-        self.senders = []
+        self.senders: list[StupidArtnet] = []
         self.fixtures_in_universe: dict[int, Set[Fixture]] = self._split_fixtures_in_universes()
         self.senders = self._get_senders_for_universes()
 
-    def run_after_processing(self):
-        dmx_frames = []
-        while self.dmx_queue.qsize() != 0:
-            dmx_frames.append(self.dmx_queue.get_nowait())
-        dmx_frame = list(itertools.chain(*dmx_frames))
-        for sender in self.senders:
-            logging.warning(F"Setting Frames for universe {sender.universe}")
-            for frame in dmx_frame:
-                logging.debug(F"{frame}")
-                sender.set_single_value(frame.channel, frame.value)
-            sender.show()
 
     def delete(self):
         super().delete()
@@ -48,6 +35,17 @@ class ArtNetSender(SenderBase):
             fixtures_in_universe = [fixture for fixture in self.fixtures if fixture.dmx_universe == universe]
             universes[universe] = set(fixtures_in_universe)
         return universes
+
+    def send(self, dmx_values: list[DmxSignal]):
+        for sender in self.senders:
+            for frame in dmx_values:
+                if frame.universe != sender.universe:
+                    continue
+                for channel_value in frame.channel_values:
+                    sender.set_single_value(channel_value.channel, channel_value.value)
+        for sender in self.senders:
+            sender.show()
+
 
     @staticmethod
     def add_command_line_arguments(parser: argparse) -> argparse:

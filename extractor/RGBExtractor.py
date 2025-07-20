@@ -1,45 +1,37 @@
 import asyncio
+import logging
 
 from extractor.ExtractorBase import ExtractorBase
-from shared.fixture import ChannelType as ct
-from shared.DmxChannelValue import DmxChannelValue
+from shared.fixture.ChannelValue import ChannelValue
+from shared.fixture.FixtureSignal import FixtureSignal
 from shared.shared_memory.NumpyArrayReceiver import NumpyArrayReceiver
-from shared.shared_memory.SmSender import SmSender
+from shared.fixture.ChannelType import ChannelType as ct
 
 
 class RGBExtractor(ExtractorBase):
-    def __init__(self, inbound_data_senders, fixtures):
-        super().__init__(inbound_data_senders, fixtures)
+    def __init__(self, inbound_data_senders, fixtures, fixtures_signal_queue):
+        super().__init__(inbound_data_senders, fixtures, fixtures_signal_queue)
         self.rgb_data_receiver = NumpyArrayReceiver(inbound_data_senders.get("RGB-image"))
         self.relevant_fixtures = [fixture for fixture in fixtures if fixture.dmx_addresses[1] == ct.COLOR_RED or
                                   ct.COLOR_GREEN or
                                   ct.COLOR_BLUE]
 
-    def delete(self):
-        super().delete()
-        self.rgb_data_receiver.close()
-        del self.relevant_fixtures
-
-    def get_outbound_data_senders(self) -> dict[str, SmSender]:
-        return {}
-
     async def run_procedure(self):
         rbg_data = self.rgb_data_receiver.read_on_update()
-        if self.complexity >= 20:
-            await asyncio.sleep(1.5)
-        else:
-            await asyncio.sleep(0.5)
-        dmx_frame = []
+        fixture_values = []
         for fixture in self.relevant_fixtures:
+            channel_values = []
             rgb_values = rbg_data[fixture.position[0], fixture.position[1], fixture.position[2]]
             for dmx_address in fixture.dmx_addresses:
                 if dmx_address[1] == ct.COLOR_RED:
-                    dmx_frame.append(
-                        DmxChannelValue(fixture.fixture_id, dmx_address[0], int(rgb_values[0])))
+                    channel_values.append(
+                        ChannelValue(dmx_address[0], int(rgb_values[0])))
                 elif dmx_address[1] == ct.COLOR_GREEN:
-                    dmx_frame.append(
-                        DmxChannelValue(fixture.fixture_id, dmx_address[0], int(rgb_values[1])))
+                    channel_values.append(
+                        ChannelValue(dmx_address[0], int(rgb_values[1])))
                 elif dmx_address[1] == ct.COLOR_BLUE:
-                    dmx_frame.append(
-                        DmxChannelValue(fixture.fixture_id, dmx_address[0], int(rgb_values[2])))
-        self.dmx_queue.put(dmx_frame)
+                    channel_values.append(
+                        ChannelValue(dmx_address[0], int(rgb_values[2])))
+            fixture_values.append((fixture, channel_values))
+            logging.debug(f"RGB Extractor setting Signal for fixture: {fixture.fixture_id}")
+            self.fixture_signal_queue_sender.update(FixtureSignal(self.__class__.__name__, fixture, channel_values))

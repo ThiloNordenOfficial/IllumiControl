@@ -1,23 +1,18 @@
 from abc import abstractmethod
 
-from shared import TimingReceiver, StatisticWriter, DataSender, DmxQueueUser, TimedRunner
-from shared.shared_memory.NumpyArraySender import NumpyArraySender
+from shared import StatisticWriter
+from shared.fixture.FixtureSignal import FixtureSignal
+from shared.shared_memory import SmSender, QueueSender
+from shared.runner.TimedRunner import TimedRunner
 
 
-class ExtractorBase(DmxQueueUser, DataSender, TimedRunner):
-    def __init__(self, inbound_data_senders: dict[str, NumpyArraySender], fixtures):
+class ExtractorBase(TimedRunner):
+    def __init__(self, inbound_data_senders: dict[str, SmSender], fixtures, fixture_signal_queue_sender: QueueSender[FixtureSignal]):
         TimedRunner.__init__(self, inbound_data_senders)
-        DmxQueueUser.__init__(self)
         StatisticWriter.__init__(self)
-        self.inbound_data_senders = inbound_data_senders
         self.fixtures = fixtures
+        self.fixture_signal_queue_sender = fixture_signal_queue_sender
 
     @abstractmethod
-    def delete(self):
-        TimingReceiver.delete(self)
-        DmxQueueUser.delete(self)
-
-        del self.inbound_data_senders
-        del self.fixtures
-
-    delete = abstractmethod(delete)
+    async def run_procedure(self):
+        pass

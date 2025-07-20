@@ -4,3 +4,5 @@ from .NumpyArraySender import NumpyArraySender
 from .NumpyArrayReceiver import NumpyArrayReceiver
 from .SmReceiver import SmReceiver
 from .SmSender import SmSender
+from .QueueSender import QueueSender
+from .QueueReceiver import QueueReceiver

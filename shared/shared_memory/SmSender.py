@@ -30,7 +30,8 @@ class SmSender(Generic[T]):
     def as_type(sender: object, clazz: Type[S]) -> S:
         if not sender:
             raise ValueError("Sender instance must be provided")
-        if not isinstance(sender, clazz):
+        check_type = getattr(clazz, "__origin__", clazz)
+        if not isinstance(sender, check_type):
             raise TypeError(f"Expected sender to be an instance of {clazz.__name__}, got {type(sender).__name__}")
         return cast(S, sender)
 

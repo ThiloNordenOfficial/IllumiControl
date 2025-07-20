@@ -5,11 +5,20 @@ from shared.fixture.Fixture import Fixture
 
 
 class FixtureConfigurationLoader:
+    _instance = None
+
+    def __new__(cls, file_path):
+        if cls._instance is None:
+            cls._instance = super(FixtureConfigurationLoader, cls).__new__(cls)
+        return cls._instance
+
     def __init__(self, file_path):
-        self.file_path = file_path
-        self.configuration = None
-        self.load_configuration()
-        self.fixtures = self.load_fixtures_from_configuration()
+        if not hasattr(self, 'initialized'):
+            self.file_path = file_path
+            self.configuration = None
+            self.load_configuration()
+            self.fixtures = self.load_fixtures_from_configuration()
+            self.initialized = True
 
     def load_configuration(self):
         logging.debug(f"Loading configuration from {self.file_path}")
