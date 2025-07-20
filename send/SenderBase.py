@@ -1,18 +1,25 @@
 from abc import abstractmethod
 
-from shared import NumpyArrayReceiver
 from shared.fixture.DmxSignal import DmxSignal
 from shared.fixture.Fixture import Fixture
+from shared.runner import PostTimeRunner
+from shared.shared_memory import NumpyArrayReceiver
 
 
-class SenderBase():
+class SenderBase(PostTimeRunner):
     def __init__(self, data_senders: dict[str, 'SmSender'], fixtures: list[Fixture]):
-        super().__init__()
+        super().__init__(data_senders)
         self.fixtures = fixtures
         self.post_processor_finished_receiver = NumpyArrayReceiver(data_senders.get("post_processing_finished"))
 
+    async def run_after_processing(self, *args, **kwargs):
+        if not args or not isinstance(args[0], list):
+            raise ValueError("No DMX values provided")
+        dmx_values = args[0]
+        return await self.run_after(dmx_values)
+
     @abstractmethod
-    def send(self, dmx_values: list[DmxSignal]):
+    async def run_after(self, dmx_values: list[DmxSignal]):
         pass
 
-    abstractmethod(send)
+    abstractmethod(run_after)

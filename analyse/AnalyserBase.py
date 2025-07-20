@@ -6,9 +6,9 @@ from shared.shared_memory.SmSender import SmSender
 
 
 class AnalyserBase(DataSender, TimedRunner):
-    def __init__(self, inbound_data_senders: dict[str, 'SmSender']):
+    def __init__(self, data_senders: dict[str, 'SmSender']):
         super().__init__()
-        self.inbound_data_senders = inbound_data_senders
+        self.inbound_data_senders = data_senders
 
     @abstractmethod
     def delete(self):

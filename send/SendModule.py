@@ -2,11 +2,10 @@ import asyncio
 import logging
 
 from send.SenderBase import SenderBase
-from shared import NumpyArrayReceiver
 from shared.fixture.DmxSignal import DmxSignal
 from shared.fixture.FixtureConsumer import FixtureConsumer
 from shared.runner.Runner import Runner
-from shared.shared_memory import SmSender
+from shared.shared_memory import SmSender, NumpyArrayReceiver
 from shared.shared_memory.QueueReceiver import QueueReceiver
 
 
@@ -35,5 +34,5 @@ class SendModule(Runner):
         dmx_values = self.dmx_value_queue.get_all_present()
         threads = []
         for sender in self.senders:
-            threads.append(asyncio.to_thread(sender.send, dmx_values))
+            threads.append(asyncio.to_thread(sender.run, dmx_values))
         await asyncio.gather(*threads)

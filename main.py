@@ -1,17 +1,16 @@
 import argparse
 import logging
 import signal
-import threading
 from multiprocessing import Process
-
-from analyse.AnalyseModule import AnalyseModule
-from postprocess.PostProcessModule import PostProcessModule
-from send.SendModule import SendModule
 from shared.CommandLineArgumentAdder import CommandLineArgumentAdder
-from ingest import IngestModule
-from extract import ExtractModule
-from generate import GenerateModule
 from shared import ConfigReader, GracefulKiller, LoggingConfigurator
+
+from ingest import IngestModule
+from analyse import AnalyseModule
+from generate import GenerateModule
+from extract import ExtractModule
+from postprocess import PostProcessModule
+from send import SendModule
 
 
 class IllumiControl:

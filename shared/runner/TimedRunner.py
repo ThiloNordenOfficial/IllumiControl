@@ -4,14 +4,13 @@ import time
 from abc import abstractmethod
 from typing import final
 
-from shared import TimingReceiver
 from shared.runner.Runner import Runner
-from shared.shared_memory import SmSender
+from shared.shared_memory import SmSender, TimingReceiver
 
 
 class TimedRunner(Runner, TimingReceiver):
-    def __init__(self, inbound_data_senders: dict[str, SmSender]):
-        TimingReceiver.__init__(self, inbound_data_senders)
+    def __init__(self, data_senders: dict[str, SmSender]):
+        TimingReceiver.__init__(self, data_senders)
         Runner.__init__(self)
         self.complexity = 1
         self._max_complexity = 100000000

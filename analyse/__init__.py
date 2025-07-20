@@ -1,1 +1,2 @@
-from .OpenSMILEAnalyser import OpenSmileAnalyser
+from .AnalyseModule import AnalyseModule
+from .components import *

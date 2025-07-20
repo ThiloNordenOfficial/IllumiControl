@@ -10,7 +10,7 @@ T = TypeVar('T')
 class QueueReceiver[T](SmReceiver[T]):
     def __init__(self, sender: SmSender):
         super().__init__(sender, QueueSender[T])
-        self.queue = Queue(sender.name)
+        self.queue = Queue(self.sender.name)
 
     def close(self):
         self.sender.unregister_receiver(self)

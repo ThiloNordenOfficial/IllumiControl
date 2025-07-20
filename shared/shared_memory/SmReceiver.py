@@ -9,7 +9,7 @@ T = TypeVar('T')
 
 class SmReceiver(Generic[T]):
 
-    def __init__(self, sender: 'SmSender', clazz: type):
+    def __init__(self, sender: 'SmSender', clazz: type['SmSender']):
         self.sender: T = sender.as_type(sender,clazz)
         self.sender.register_receiver(self)
 

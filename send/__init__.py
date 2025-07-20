@@ -1,2 +1,2 @@
 from .SendModule import SendModule
-from .ArtNetSender import ArtNetSender
+from .components import *

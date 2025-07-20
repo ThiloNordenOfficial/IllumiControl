@@ -1,20 +1,17 @@
-import asyncio
 import logging
 
 import numpy as np
 
 from postprocess.PostProcessorBase import PostProcessorBase
-from shared import TimingReceiver, DataSender, NumpyArraySender, GracefulKiller
+from shared import DataSender, GracefulKiller
 from shared.fixture.DmxSignal import DmxSignal
 from shared.fixture.FixtureSignal import FixtureSignal
-from shared.shared_memory import SmSender, QueueReceiver
-from shared.shared_memory.QueueSender import QueueSender
+from shared.shared_memory import SmSender, QueueReceiver, NumpyArraySender, QueueSender
 
 
-class PostProcessModule(TimingReceiver, DataSender, GracefulKiller):
+class PostProcessModule(GracefulKiller, DataSender):
 
     def __init__(self, data_senders: dict[str, SmSender]):
-        TimingReceiver.__init__(self, data_senders)
         DataSender.__init__(self)
         self.fixture_signal_queue = QueueReceiver[FixtureSignal](data_senders.get('fixture_signal_queue'))
         self.dmx_queue_sender = QueueSender[DmxSignal]("dmx")
@@ -23,11 +20,11 @@ class PostProcessModule(TimingReceiver, DataSender, GracefulKiller):
 
     def delete(self):
         logging.info("Deleting post processors")
-        self.fixture_signal_queue.close()
-        self.dmx_queue_sender.close()
-        self.post_processing_finished_sender.close()
         for postprocessor in self.post_processors:
             postprocessor.delete()
+        self.post_processing_finished_sender.close()
+        self.fixture_signal_queue.close()
+        self.dmx_queue_sender.close()
         super().delete()
 
     def _instantiate_post_processors(self, data_senders) -> list[PostProcessorBase]:
@@ -38,11 +35,7 @@ class PostProcessModule(TimingReceiver, DataSender, GracefulKiller):
 
     def run(self):
         logging.debug("Starting post processor run loop")
-        asyncio.run(self._run())
-
-    async def _run(self):
         while not self.kill_event.is_set():
-            await asyncio.sleep(float(self.timing_receiver.read_on_update()[0]))
             fixture_signals = self.fixture_signal_queue.get_all_present()
             if fixture_signals:
                 dmx_signals = []

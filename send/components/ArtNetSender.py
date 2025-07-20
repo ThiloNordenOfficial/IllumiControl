@@ -36,7 +36,7 @@ class ArtNetSender(SenderBase):
             universes[universe] = set(fixtures_in_universe)
         return universes
 
-    def send(self, dmx_values: list[DmxSignal]):
+    async def run_after(self, dmx_values: list[DmxSignal]):
         for sender in self.senders:
             for frame in dmx_values:
                 if frame.universe != sender.universe:

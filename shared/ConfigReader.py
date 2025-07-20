@@ -1,7 +1,7 @@
 import argparse
 import configparser
 
-from shared import is_valid_file
+from shared.validators import is_valid_file
 
 
 class ConfigReader:

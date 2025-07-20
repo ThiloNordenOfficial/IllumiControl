@@ -7,8 +7,8 @@ from shared.shared_memory import SmSender, QueueSender
 
 
 class ExtractorBase(TimedRunner):
-    def __init__(self, inbound_data_senders: dict[str, SmSender], fixtures, fixture_signal_queue_sender: QueueSender[FixtureSignal]):
-        TimedRunner.__init__(self, inbound_data_senders)
+    def __init__(self, data_senders: dict[str, SmSender], fixtures, fixture_signal_queue_sender: QueueSender[FixtureSignal]):
+        TimedRunner.__init__(self, data_senders)
         StatisticWriter.__init__(self)
         self.fixtures = fixtures
         self.fixture_signal_queue_sender = fixture_signal_queue_sender

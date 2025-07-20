@@ -1,3 +1,3 @@
 from .GenerateModule import GenerateModule
-from .stable_diffusion import *
-from .RGBGenerator import RGBGenerator
+from .GeneratorBase import GeneratorBase
+from .components import *
