@@ -1,5 +1,5 @@
+import asyncio
 import logging
-import threading
 
 from ingest.IngestBase import IngestBase
 from shared import DataSender
@@ -26,15 +26,13 @@ class IngestModule(DataSender):
 
     def run(self):
         logging.debug("Starting ingest run loop")
+        asyncio.run(self._run())
+
+    async def _run(self):
         ingest_threads = []
         for ingestor in self.ingestors:
-            ingest_threads.append(threading.Thread(target=ingestor.run))
-
-        for ingestor in ingest_threads:
-            ingestor.start()
-
-        for ingestor in ingest_threads:
-            ingestor.join()
+            ingest_threads.append(asyncio.to_thread(ingestor.run))
+        await asyncio.gather(*ingest_threads)
 
     def get_outbound_data_senders(self) -> dict[str, SmSender]:
         return self.data_senders
