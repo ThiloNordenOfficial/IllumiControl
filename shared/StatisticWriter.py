@@ -30,9 +30,10 @@ class StatisticWriter(GracefulKiller, CommandLineArgumentAdder):
             os.remove(file_path)
         return open(file_path, 'x')
 
-    def write_statistics(self, data):
+    def write_statistics(self, time_taken: float):
         if self.statistics_are_active:
-            self._file_handle.write(f"{datetime.now()}: {data}\n")
+            time_taken_trimmed = "{:.6f}".format(time_taken)
+            self._file_handle.write(f"{datetime.now()}, {time_taken_trimmed}\n",)
             self._file_handle.flush()
 
     @staticmethod
