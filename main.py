@@ -4,13 +4,13 @@ import signal
 import threading
 from multiprocessing import Process
 
-from analyse.Analyse import Analyse
-from postprocess.PostProcess import PostProcess
-from send.Send import Send
+from analyse.AnalyseModule import AnalyseModule
+from postprocess.PostProcessModule import PostProcessModule
+from send.SendModule import SendModule
 from shared.CommandLineArgumentAdder import CommandLineArgumentAdder
-from ingest import Ingest
-from extract import Extract
-from generate import Generate
+from ingest import IngestModule
+from extract import ExtractModule
+from generate import GenerateModule
 from shared import ConfigReader, GracefulKiller, LoggingConfigurator
 
 
@@ -57,22 +57,22 @@ class IllumiControl:
         signal.signal(signal.SIGTERM, IllumiControl.set_shutdown_event)
 
     def initialize_components(self):
-        self.ingest = Ingest()
+        self.ingest = IngestModule()
         self.data_senders.update(self.ingest.get_outbound_data_senders())
 
-        self.analyse = Analyse(self.data_senders)
+        self.analyse = AnalyseModule(self.data_senders)
         self.data_senders.update(self.analyse.get_outbound_data_senders())
 
-        self.generate = Generate(self.data_senders)
+        self.generate = GenerateModule(self.data_senders)
         self.data_senders.update(self.generate.get_outbound_data_senders())
 
-        self.extract = Extract(self.data_senders)
+        self.extract = ExtractModule(self.data_senders)
         self.data_senders.update(self.extract.get_outbound_data_senders())
 
-        self.post_process = PostProcess(self.data_senders)
+        self.post_process = PostProcessModule(self.data_senders)
         self.data_senders.update(self.post_process.get_outbound_data_senders())
 
-        self.send = Send(self.data_senders)
+        self.send = SendModule(self.data_senders)
 
     def start_threads(self):
         ingest_runner = Process(target=self.ingest.run, name='Ingest')

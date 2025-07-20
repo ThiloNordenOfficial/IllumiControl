@@ -6,7 +6,7 @@ from shared import DataSender
 from shared.shared_memory.SmSender import SmSender
 
 
-class Ingest(DataSender):
+class IngestModule(DataSender):
     def __init__(self):
         logging.info("Initializing ingest")
         self.ingestors = self._instantiate_ingestors()

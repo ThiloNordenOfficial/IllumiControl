@@ -9,7 +9,7 @@ from shared.shared_memory import QueueSender
 from shared.shared_memory.SmSender import SmSender
 
 
-class Extract(FixtureConsumer, DataSender):
+class ExtractModule(FixtureConsumer, DataSender):
     def __init__(self, data_senders: dict[str, SmSender]):
         logging.info("Initializing feature extractor")
         FixtureConsumer.__init__(self)

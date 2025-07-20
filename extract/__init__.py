@@ -1,2 +1,2 @@
-from .Extract import Extract
+from .ExtractModule import ExtractModule
 from .RGBExtractor import RGBExtractor

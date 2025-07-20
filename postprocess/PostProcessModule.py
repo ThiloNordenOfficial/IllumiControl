@@ -11,7 +11,7 @@ from shared.shared_memory import SmSender, QueueReceiver
 from shared.shared_memory.QueueSender import QueueSender
 
 
-class PostProcess(TimingReceiver, DataSender, GracefulKiller):
+class PostProcessModule(TimingReceiver, DataSender, GracefulKiller):
 
     def __init__(self, data_senders: dict[str, SmSender]):
         TimingReceiver.__init__(self, data_senders)

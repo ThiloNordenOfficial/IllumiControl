@@ -10,7 +10,7 @@ from shared.shared_memory import SmSender
 from shared.shared_memory.QueueReceiver import QueueReceiver
 
 
-class Send(Runner):
+class SendModule(Runner):
 
     def __init__(self, data_senders: dict[str, SmSender]):
         super().__init__()

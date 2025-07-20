@@ -7,7 +7,7 @@ from shared import DataSender
 from shared.shared_memory.SmSender import SmSender
 
 
-class Analyse(DataSender):
+class AnalyseModule(DataSender):
     def __init__(self, data_senders: dict[str, SmSender]):
         logging.info("Initializing audio analysers")
         self.timing_provider = self._instantiate_timing_provider(data_senders)

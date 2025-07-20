@@ -9,7 +9,7 @@ from shared.shared_memory.NumpyArraySender import NumpyArraySender
 from shared.shared_memory.SmSender import SmSender
 
 
-class Generate(CommandLineArgumentAdder, DataSender):
+class GenerateModule(CommandLineArgumentAdder, DataSender):
     height = None
     width = None
     depth = None
