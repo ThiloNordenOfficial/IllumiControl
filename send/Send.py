@@ -1,10 +1,8 @@
 import asyncio
 import logging
-from multiprocessing import Process
-from threading import Thread
 
-from sender.SenderBase import SenderBase
-from shared import GracefulKiller, NumpyArrayReceiver
+from send.SenderBase import SenderBase
+from shared import NumpyArrayReceiver
 from shared.fixture.DmxSignal import DmxSignal
 from shared.fixture.FixtureConsumer import FixtureConsumer
 from shared.runner.Runner import Runner
@@ -12,7 +10,7 @@ from shared.shared_memory import SmSender
 from shared.shared_memory.QueueReceiver import QueueReceiver
 
 
-class Senders(Runner):
+class Send(Runner):
 
     def __init__(self, data_senders: dict[str, SmSender]):
         super().__init__()

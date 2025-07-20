@@ -1,11 +1,12 @@
 import logging
 import threading
+
 from ingest.IngestBase import IngestBase
 from shared import DataSender
 from shared.shared_memory.SmSender import SmSender
 
 
-class Ingests(DataSender):
+class Ingest(DataSender):
     def __init__(self):
         logging.info("Initializing ingest")
         self.ingestors = self._instantiate_ingestors()

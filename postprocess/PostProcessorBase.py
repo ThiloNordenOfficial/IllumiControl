@@ -1,6 +1,6 @@
 from abc import abstractmethod
 
-from postprocessor.PostProcessorRunner import PostProcessorRunner
+from postprocess.PostProcessorRunner import PostProcessorRunner
 from shared.fixture.DmxSignal import DmxSignal
 from shared.fixture.FixtureSignal import FixtureSignal
 

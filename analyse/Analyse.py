@@ -1,13 +1,13 @@
 import logging
 from multiprocessing import Process
 
-from analyser.AnalyserBase import AnalyserBase
-from analyser.TimingProviderBase import TimingProviderBase
+from analyse.AnalyserBase import AnalyserBase
+from analyse.TimingProviderBase import TimingProviderBase
 from shared import DataSender
 from shared.shared_memory.SmSender import SmSender
 
 
-class Analysers(DataSender):
+class Analyse(DataSender):
     def __init__(self, data_senders: dict[str, SmSender]):
         logging.info("Initializing audio analysers")
         self.timing_provider = self._instantiate_timing_provider(data_senders)

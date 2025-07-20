@@ -1,11 +1,10 @@
-import asyncio
 import logging
 
-from extractor.ExtractorBase import ExtractorBase
+from extract.ExtractorBase import ExtractorBase
+from shared.fixture.ChannelType import ChannelType as ct
 from shared.fixture.ChannelValue import ChannelValue
 from shared.fixture.FixtureSignal import FixtureSignal
 from shared.shared_memory.NumpyArrayReceiver import NumpyArrayReceiver
-from shared.fixture.ChannelType import ChannelType as ct
 
 
 class RGBExtractor(ExtractorBase):

@@ -5,9 +5,9 @@ from matplotlib import pyplot as plt
 from torch import nn
 from torchvision.utils import save_image
 
-from generator.stable_diffusion.UNet import UNet
-from generator.stable_diffusion.forward_diffusion_process import forward_diffusion_process
-from generator.stable_diffusion.linear_beta_schedule import linear_beta_schedule
+from generate.stable_diffusion.UNet import UNet
+from generate.stable_diffusion.forward_diffusion_process import forward_diffusion_process
+from generate.stable_diffusion.linear_beta_schedule import linear_beta_schedule
 from torchvision import datasets, transforms
 from torch.utils.data import DataLoader
 

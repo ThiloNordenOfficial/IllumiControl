@@ -2,14 +2,14 @@ import argparse
 import logging
 from multiprocessing import Process
 
-from shared.CommandLineArgumentAdder import CommandLineArgumentAdder
-from generator.GeneratorBase import GeneratorBase
+from generate.GeneratorBase import GeneratorBase
 from shared import DataSender
+from shared.CommandLineArgumentAdder import CommandLineArgumentAdder
 from shared.shared_memory.NumpyArraySender import NumpyArraySender
 from shared.shared_memory.SmSender import SmSender
 
 
-class Generators(CommandLineArgumentAdder, DataSender):
+class Generate(CommandLineArgumentAdder, DataSender):
     height = None
     width = None
     depth = None

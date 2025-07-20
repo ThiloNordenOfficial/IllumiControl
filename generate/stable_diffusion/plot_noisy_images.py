@@ -1,8 +1,8 @@
 import torch
 from matplotlib import pyplot as plt
 
-from generator.stable_diffusion.forward_diffusion_process import forward_diffusion_process
-from generator.stable_diffusion.linear_beta_schedule import linear_beta_schedule
+from generate.stable_diffusion.forward_diffusion_process import forward_diffusion_process
+from generate.stable_diffusion.linear_beta_schedule import linear_beta_schedule
 
 
 def plot_noisy_images(image, noise_schedule, steps=[0, 100, 500, 999]):

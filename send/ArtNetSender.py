@@ -4,7 +4,7 @@ from typing import Set
 
 from stupidArtnet import StupidArtnet
 
-from sender.SenderBase import SenderBase
+from send.SenderBase import SenderBase
 from shared.fixture import Fixture
 from shared.fixture.DmxSignal import DmxSignal
 from shared.shared_memory import SmSender

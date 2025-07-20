@@ -2,14 +2,14 @@ import torch
 from matplotlib import pyplot as plt
 from torch import nn
 
-from generator.stable_diffusion.UNet import UNet
-from generator.stable_diffusion.VAE.VAE import VAE
-from generator.stable_diffusion.VAE.VAEDecoder import VAEDecoder
-from generator.stable_diffusion.VAE.VAEEncoder import VAEEncoder
-from generator.stable_diffusion.forward_diffusion_process import forward_diffusion_process
-from generator.stable_diffusion.linear_beta_schedule import linear_beta_schedule
-from generator.stable_diffusion.plot_noisy_images import plot_noisy_images
-from generator.stable_diffusion.reverse_diffusion_step import reverse_diffusion_step
+from generate.stable_diffusion.UNet import UNet
+from generate.stable_diffusion.VAE.VAE import VAE
+from generate.stable_diffusion.VAE.VAEDecoder import VAEDecoder
+from generate.stable_diffusion.VAE.VAEEncoder import VAEEncoder
+from generate.stable_diffusion.forward_diffusion_process import forward_diffusion_process
+from generate.stable_diffusion.linear_beta_schedule import linear_beta_schedule
+from generate.stable_diffusion.plot_noisy_images import plot_noisy_images
+from generate.stable_diffusion.reverse_diffusion_step import reverse_diffusion_step
 
 
 if __name__ == "__main__":

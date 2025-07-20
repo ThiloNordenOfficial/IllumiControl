@@ -1,14 +1,15 @@
+import logging
 from multiprocessing import Process
 
-from extractor.ExtractorBase import ExtractorBase
+from extract.ExtractorBase import ExtractorBase
 from shared import DataSender
 from shared.fixture.FixtureConsumer import FixtureConsumer
 from shared.fixture.FixtureSignal import FixtureSignal
 from shared.shared_memory import QueueSender
 from shared.shared_memory.SmSender import SmSender
-import logging
 
-class Extractors(FixtureConsumer, DataSender):
+
+class Extract(FixtureConsumer, DataSender):
     def __init__(self, data_senders: dict[str, SmSender]):
         logging.info("Initializing feature extractor")
         FixtureConsumer.__init__(self)

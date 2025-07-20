@@ -5,8 +5,7 @@ import numpy as np
 import opensmile
 from opensmile import FeatureLevel
 
-from analyser.AnalyserBase import AnalyserBase
-from analyser.TimingProviderBase import TimingProviderBase
+from analyse.TimingProviderBase import TimingProviderBase
 from ingest import AudioProvider
 from shared.CommandLineArgumentAdder import CommandLineArgumentAdder
 from shared.shared_memory.ByteReceiver import ByteReceiver
@@ -20,7 +19,7 @@ class OpenSmileAnalyser(TimingProviderBase, CommandLineArgumentAdder):
 
     def __init__(self, inbound_data_senders: dict[str, SmSender]):
         self.timing_sender = NumpyArraySender(shape=np.shape(np.array([1.])), dtype=np.float64)
-        inbound_data_senders.update([("npa-timing-data", self.timing_sender)])
+        inbound_data_senders.update([("timing-data", self.timing_sender)])
         super().__init__(inbound_data_senders)
         self.smile = opensmile.Smile(
             feature_set=self.feature_set,
@@ -56,8 +55,8 @@ class OpenSmileAnalyser(TimingProviderBase, CommandLineArgumentAdder):
 
     def get_outbound_data_senders(self) -> dict[str, SmSender]:
         return {
-            "npa-timing-data": self.timing_sender,
-            "npa-audio-data": self.audio_data_sender
+            "timing-data": self.timing_sender,
+            "audio-data": self.audio_data_sender
         }
 
     @staticmethod

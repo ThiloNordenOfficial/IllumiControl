@@ -1,11 +1,9 @@
-import asyncio
 import time
 from abc import abstractmethod
 
 from shared import TimingReceiver, StatisticWriter
 from shared.fixture.DmxSignal import DmxSignal
 from shared.fixture.FixtureSignal import FixtureSignal
-from shared.runner.Runner import Runner
 from shared.shared_memory import SmSender
 
 

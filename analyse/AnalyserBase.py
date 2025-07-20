@@ -1,7 +1,6 @@
 from abc import abstractmethod
 
 from shared import DataSender
-from shared.runner.Runner import Runner
 from shared.runner.TimedRunner import TimedRunner
 from shared.shared_memory.SmSender import SmSender
 

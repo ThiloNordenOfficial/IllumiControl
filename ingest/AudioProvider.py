@@ -1,8 +1,6 @@
 import argparse
-import asyncio
 import logging
 import math
-from multiprocessing import Process
 from typing import Mapping
 
 import pyaudio
@@ -70,7 +68,6 @@ class AudioProvider(IngestBase, CommandLineArgumentAdder, GracefulKiller):
 
     def run(self):
         self.stream.start_stream()
-
 
     def write_audio_to_memory(self, in_data: bytes | None, frame_count: int, time_info: Mapping[str, float],
                               status: int) -> \

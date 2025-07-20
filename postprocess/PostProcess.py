@@ -3,7 +3,7 @@ import logging
 
 import numpy as np
 
-from postprocessor.PostProcessorBase import PostProcessorBase
+from postprocess.PostProcessorBase import PostProcessorBase
 from shared import TimingReceiver, DataSender, NumpyArraySender, GracefulKiller
 from shared.fixture.DmxSignal import DmxSignal
 from shared.fixture.FixtureSignal import FixtureSignal
@@ -11,7 +11,7 @@ from shared.shared_memory import SmSender, QueueReceiver
 from shared.shared_memory.QueueSender import QueueSender
 
 
-class PostProcessors(TimingReceiver, DataSender, GracefulKiller):
+class PostProcess(TimingReceiver, DataSender, GracefulKiller):
 
     def __init__(self, data_senders: dict[str, SmSender]):
         TimingReceiver.__init__(self, data_senders)

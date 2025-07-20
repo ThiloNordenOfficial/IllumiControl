@@ -1,4 +1,4 @@
-from postprocessor.PostProcessorBase import PostProcessorBase
+from postprocess.PostProcessorBase import PostProcessorBase
 from shared.fixture.DmxSignal import DmxSignal
 from shared.fixture.FixtureSignal import FixtureSignal
 

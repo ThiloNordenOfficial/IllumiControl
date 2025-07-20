@@ -1,2 +1,2 @@
-from .Senders import Senders
+from .Send import Send
 from .ArtNetSender import ArtNetSender

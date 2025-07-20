@@ -2,8 +2,8 @@ from abc import abstractmethod
 
 from shared import StatisticWriter
 from shared.fixture.FixtureSignal import FixtureSignal
-from shared.shared_memory import SmSender, QueueSender
 from shared.runner.TimedRunner import TimedRunner
+from shared.shared_memory import SmSender, QueueSender
 
 
 class ExtractorBase(TimedRunner):

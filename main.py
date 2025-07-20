@@ -2,26 +2,27 @@ import argparse
 import logging
 import signal
 import threading
+from multiprocessing import Process
 
-from analyser.Analysers import Analysers
-from postprocessor.PostProcessors import PostProcessors
-from sender.Senders import Senders
+from analyse.Analyse import Analyse
+from postprocess.PostProcess import PostProcess
+from send.Send import Send
 from shared.CommandLineArgumentAdder import CommandLineArgumentAdder
-from ingest import Ingests
-from extractor import Extractors
-from generator import Generators
+from ingest import Ingest
+from extract import Extract
+from generate import Generate
 from shared import ConfigReader, GracefulKiller, LoggingConfigurator
 
 
 class IllumiControl:
     def __init__(self):
         self.data_senders = {}
-        self.ingestors = None
-        self.analysers = None
-        self.generators = None
-        self.extractors = None
-        self.post_processors = None
-        self.senders = None
+        self.ingest = None
+        self.analyse = None
+        self.generate = None
+        self.extract = None
+        self.post_process = None
+        self.send = None
         self.threads = []
 
     def prepare_commandline_arguments(self) -> argparse.Namespace:
@@ -56,30 +57,30 @@ class IllumiControl:
         signal.signal(signal.SIGTERM, IllumiControl.set_shutdown_event)
 
     def initialize_components(self):
-        self.ingestors = Ingests()
-        self.data_senders.update(self.ingestors.get_outbound_data_senders())
+        self.ingest = Ingest()
+        self.data_senders.update(self.ingest.get_outbound_data_senders())
 
-        self.analysers = Analysers(self.data_senders)
-        self.data_senders.update(self.analysers.get_outbound_data_senders())
+        self.analyse = Analyse(self.data_senders)
+        self.data_senders.update(self.analyse.get_outbound_data_senders())
 
-        self.generators = Generators(self.data_senders)
-        self.data_senders.update(self.generators.get_outbound_data_senders())
+        self.generate = Generate(self.data_senders)
+        self.data_senders.update(self.generate.get_outbound_data_senders())
 
-        self.extractors = Extractors(self.data_senders)
-        self.data_senders.update(self.extractors.get_outbound_data_senders())
+        self.extract = Extract(self.data_senders)
+        self.data_senders.update(self.extract.get_outbound_data_senders())
 
-        self.post_processors = PostProcessors(self.data_senders)
-        self.data_senders.update(self.post_processors.get_outbound_data_senders())
+        self.post_process = PostProcess(self.data_senders)
+        self.data_senders.update(self.post_process.get_outbound_data_senders())
 
-        self.senders = Senders(self.data_senders)
+        self.send = Send(self.data_senders)
 
     def start_threads(self):
-        ingest_runner = threading.Thread(target=self.ingestors.run)
-        analyser_runner = threading.Thread(target=self.analysers.run)
-        generator_runner = threading.Thread(target=self.generators.run)
-        extractor_runner = threading.Thread(target=self.extractors.run)
-        post_processor_runner = threading.Thread(target=self.post_processors.run)
-        sender_runner = threading.Thread(target=self.senders.run)
+        ingest_runner = Process(target=self.ingest.run, name='Ingest')
+        analyser_runner = Process(target=self.analyse.run, name='Analyse')
+        generator_runner = Process(target=self.generate.run, name='Generate')
+        extractor_runner = Process(target=self.extract.run, name='Extract')
+        post_processor_runner = Process(target=self.post_process.run, name='PostProcess')
+        sender_runner = Process(target=self.send.run, name='Send')
 
         self.threads = [ingest_runner, analyser_runner, generator_runner, extractor_runner,
                         post_processor_runner,

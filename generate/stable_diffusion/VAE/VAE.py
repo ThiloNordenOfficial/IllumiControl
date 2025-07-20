@@ -1,7 +1,7 @@
 from torch import nn
 
-from generator.stable_diffusion.VAE.VAEDecoder import VAEDecoder
-from generator.stable_diffusion.VAE.VAEEncoder import VAEEncoder
+from generate.stable_diffusion.VAE.VAEDecoder import VAEDecoder
+from generate.stable_diffusion.VAE.VAEEncoder import VAEEncoder
 
 
 class VAE(nn.Module):

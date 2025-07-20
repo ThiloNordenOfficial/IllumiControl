@@ -1,2 +1,2 @@
-from .Ingests import Ingests
+from .Ingest import Ingest
 from .AudioProvider import AudioProvider
