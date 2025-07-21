@@ -7,11 +7,13 @@ from shared.shared_memory.SmSender import SmSender
 
 class AnalyserBase(DataSender, TimedRunner):
     def __init__(self, data_senders: dict[str, 'SmSender']):
-        super().__init__()
-        self.inbound_data_senders = data_senders
+        DataSender.__init__(self)
+        TimedRunner.__init__(self, data_senders)
 
     @abstractmethod
-    def delete(self):
-        del self.inbound_data_senders
+    def get_outbound_data_senders(self) -> dict[str, SmSender]:
+        pass
 
-    delete = abstractmethod(delete)
+    @abstractmethod
+    async def run_procedure(self):
+        pass

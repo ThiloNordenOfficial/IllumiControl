@@ -15,7 +15,9 @@ class RGBGenerator(GeneratorBase, CommandLineArgumentAdder):
     depth = None
 
     def __init__(self, data_senders):
-        super().__init__(data_senders)
+        GeneratorBase.__init__(self,data_senders)
+        CommandLineArgumentAdder.__init__(self)
+
         self.shape = (self.height, self.width, self.depth, 3)
         self.data_receiver = NumpyArrayReceiver(data_senders.get("audio-data"))
         self.rgb_data_sender = NumpyArraySender(self.shape, np.uint8)

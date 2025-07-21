@@ -25,7 +25,8 @@ class OpenSmileAnalyser(TimingProviderBase, CommandLineArgumentAdder):
             feature_set=self.feature_set,
             feature_level=FeatureLevel.Functionals,
         )
-        self.raw_audio_data_receiver = ByteReceiver(inbound_data_senders.get("b-raw-audio-data"))
+        self.raw_audio_data_receiver = ByteReceiver(inbound_data_senders.get("raw-audio-data"))
+        logging.error(self.smile.num_features)
         self.audio_data_sender = NumpyArraySender(shape=(1, self.smile.num_features),
                                                   dtype=np.float64)
 
@@ -42,7 +43,8 @@ class OpenSmileAnalyser(TimingProviderBase, CommandLineArgumentAdder):
             np.frombuffer(
                 value,
                 dtype=int
-            ), AudioProvider.sample_rate
+            ),
+            AudioProvider.sample_rate
         ).to_numpy()
         self.timing_sender.update(np.array([1 / self.fps]))
         return signal
@@ -62,8 +64,6 @@ class OpenSmileAnalyser(TimingProviderBase, CommandLineArgumentAdder):
     @staticmethod
     def add_command_line_arguments(parser: argparse) -> argparse:
         parser.add_argument("--feature-set", dest='feature_set', type=lambda x: is_valid_file(parser, x), required=True)
-
-    add_command_line_arguments = staticmethod(add_command_line_arguments)
 
     @classmethod
     def apply_command_line_arguments(cls, args: argparse.Namespace):

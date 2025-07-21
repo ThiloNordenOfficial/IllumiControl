@@ -4,7 +4,7 @@ from multiprocessing import Process
 from analyse.AnalyserBase import AnalyserBase
 from analyse.TimingProviderBase import TimingProviderBase
 from shared import DataSender
-from shared.shared_memory.SmSender import SmSender
+from shared.shared_memory import SmSender
 
 
 class AnalyseModule(DataSender):
@@ -44,8 +44,6 @@ class AnalyseModule(DataSender):
 
         for process in analyser_processes:
             process.start()
-
-        for process in analyser_processes:
             process.join()
 
     def get_outbound_data_senders(self) -> dict[str, SmSender]:

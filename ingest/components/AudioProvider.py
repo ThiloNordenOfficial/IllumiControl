@@ -34,10 +34,10 @@ class AudioProvider(IngestBase, CommandLineArgumentAdder, GracefulKiller):
             if AudioProvider.sample_rate is not None else self.detect_sample_rate()
         type(self).chunk_size: int = AudioProvider.chunk_size \
             if AudioProvider.chunk_size is not None else self.detect_chunk_size()
-        type(self).channels: int = AudioProvider.channels if AudioProvider.channels is not None else 1
-        self.dtype = pyaudio.paInt32
+        type(self).channels: int = AudioProvider.channels
         type(self).audio_buffer_size = AudioProvider.audio_buffer_size \
             if AudioProvider.audio_buffer_size is not None else self.sample_rate * 30  # Default to 30 seconds of audio buffer
+        self.dtype = pyaudio.paInt32
         self.raw_audio_data_sender = ByteSender(self.audio_buffer_size)
         self.stream = self.p.open(
             format=self.dtype,
@@ -57,11 +57,11 @@ class AudioProvider(IngestBase, CommandLineArgumentAdder, GracefulKiller):
         self.raw_audio_data_sender.close()
 
     def detect_sample_rate(self) -> int:
-        detected_sample_rate = self.p.get_device_info_by_index(self.device_index)['defaultSampleRate']
-        if detected_sample_rate.is_integer():
-            return int(detected_sample_rate)
+        sample_rate = self.p.get_device_info_by_index(self.device_index)['defaultSampleRate']
+        if sample_rate.is_integer():
+            return int(sample_rate)
         else:
-            return int(math.floor(detected_sample_rate))
+            return int(math.floor(sample_rate))
 
     def detect_chunk_size(self) -> int:
         return int(math.floor(self.sample_rate))
@@ -77,7 +77,7 @@ class AudioProvider(IngestBase, CommandLineArgumentAdder, GracefulKiller):
 
     def get_outbound_data_senders(self) -> dict[str, SmSender]:
         return {
-            "b-raw-audio-data": self.raw_audio_data_sender,
+            "raw-audio-data": self.raw_audio_data_sender,
         }
 
     @staticmethod
@@ -97,7 +97,7 @@ class AudioProvider(IngestBase, CommandLineArgumentAdder, GracefulKiller):
         parser.add_argument("--sample-rate", dest='sample_rate', type=int,
                             help="Desired sample rate of the audio input device, if not provided the default sample rate of the device will be used")
         parser.add_argument("--chunk-size", dest='chunk_size', type=int, help="Frames per buffer")
-        parser.add_argument("--channels", dest='channels', type=int,
+        parser.add_argument("--channels", dest='channels', type=int, default=1,
                             help="Number of channels of the audio stream, if not provided the stream will be mono")
         parser.add_argument("--audio-buffer-size", dest='audio_buffer_size', type=int)
 

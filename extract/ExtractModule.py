@@ -30,8 +30,6 @@ class ExtractModule(FixtureConsumer, DataSender):
 
         for process in extractor_processes:
             process.start()
-
-        for process in extractor_processes:
             process.join()
 
     def get_outbound_data_senders(self) -> dict[str, SmSender]:

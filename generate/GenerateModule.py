@@ -1,10 +1,8 @@
-import argparse
 import logging
 from multiprocessing import Process
 
 from generate.GeneratorBase import GeneratorBase
 from shared import DataSender
-from shared.CommandLineArgumentAdder import CommandLineArgumentAdder
 from shared.shared_memory.NumpyArraySender import NumpyArraySender
 from shared.shared_memory.SmSender import SmSender
 
@@ -35,10 +33,7 @@ class GenerateModule(DataSender):
 
         for process in generator_processes:
             process.start()
-
-        for process in generator_processes:
             process.join()
-
 
     def get_outbound_data_senders(self) -> dict[str, SmSender]:
         return self.data_senders
