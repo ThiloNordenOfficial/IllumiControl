@@ -32,7 +32,8 @@ def get_feature_set(feature_set: str):
     elif os.path.exists(feature_set):
         return feature_set
     else:
-        raise ValueError(f"Invalid feature set: {feature_set}. Must be one of the predefined sets or a valid file path.")
+        raise ValueError(
+            f"Invalid feature set: {feature_set}. Must be one of the predefined sets or a valid file path.")
 
 
 class OpenSmileAnalyser(TimingProviderBase, CommandLineArgumentAdder):
@@ -48,7 +49,6 @@ class OpenSmileAnalyser(TimingProviderBase, CommandLineArgumentAdder):
             feature_level=FeatureLevel.Functionals,
         )
         self.raw_audio_data_receiver = ByteReceiver(inbound_data_senders.get("raw-audio-data"))
-        logging.error(self.smile.num_features)
         self.audio_data_sender = NumpyArraySender(shape=(1, self.smile.num_features),
                                                   dtype=np.float64)
 
@@ -57,19 +57,12 @@ class OpenSmileAnalyser(TimingProviderBase, CommandLineArgumentAdder):
         self.audio_data_sender.update(audio_data)
 
     def digest(self) -> np.ndarray:
-        value: bytes = self.raw_audio_data_receiver.read_last()
-        if not value:
-            logging.warning("No data received from raw audio data receiver")
-            return np.array([])
+        value = self.raw_audio_data_receiver.read_last(AudioProvider.sample_rate*4)
         signal = self.smile.process_signal(
-            np.frombuffer(
-                value,
-                dtype=int
-            ),
+            value.astype(np.float32),
             AudioProvider.sample_rate
         ).to_numpy()
         self.timing_sender.update(np.array([1 / self.fps]))
-        logging.error(signal)
         return signal
 
     def delete(self):

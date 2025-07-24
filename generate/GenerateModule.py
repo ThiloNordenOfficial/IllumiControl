@@ -33,6 +33,8 @@ class GenerateModule(DataSender):
 
         for process in generator_processes:
             process.start()
+
+        for process in generator_processes:
             process.join()
 
     def get_outbound_data_senders(self) -> dict[str, SmSender]:

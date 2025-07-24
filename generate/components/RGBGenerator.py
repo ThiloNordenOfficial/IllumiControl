@@ -1,6 +1,8 @@
 import argparse
+import logging
 
 import numpy as np
+from torchaudio.functional import loudness
 
 from generate import GeneratorBase
 from shared.CommandLineArgumentAdder import CommandLineArgumentAdder
@@ -19,22 +21,25 @@ class RGBGenerator(GeneratorBase, CommandLineArgumentAdder):
         CommandLineArgumentAdder.__init__(self)
 
         self.shape = (self.height, self.width, self.depth, 3)
-        self.data_receiver = NumpyArrayReceiver(data_senders.get("audio-data"))
+        self.loudness_receiver = NumpyArrayReceiver(data_senders.get("loudness-data"))
         self.rgb_data_sender = NumpyArraySender(self.shape, np.uint8)
         self.outbound_data_senders = {
             "RGB-image": self.rgb_data_sender
         }
 
     def delete(self):
-        self.data_receiver.close()
+        self.loudness_receiver.close()
         self.timing_receiver.close()
         for sender in self.outbound_data_senders.values():
             sender.close()
 
     async def run_procedure(self):
-        audio_data = self.data_receiver.read_on_update()
-        image = np.random.randint(0, 256, self.shape, dtype=np.uint8)
-        self.rgb_data_sender.update(image)
+        loudness_min = 0
+        loudness_max = 100
+        loudness = self.loudness_receiver.read_on_update()[0][0]
+        t = np.clip((loudness - loudness_min) / (loudness_max - loudness_min), 0.0, 1.0)
+        low = int(t * 255)
+        self.rgb_data_sender.update(np.random.randint(low, 256, size=self.shape, dtype=np.uint8))
 
     def get_outbound_data_senders(self) -> dict[str, SmSender]:
         return self.outbound_data_senders

@@ -23,7 +23,7 @@ class PostTimeRunner(TimingReceiver, StatisticWriter):
         return_value = await self.run_after_processing(*args, **kwargs)
         time_taken = time.time() - start_time
         if self.statistics_are_active:
-            self.write_statistics(time_taken)
+            self.write_statistics_time(time_taken)
         return return_value
 
     @abstractmethod

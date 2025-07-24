@@ -44,6 +44,8 @@ class AnalyseModule(DataSender):
 
         for process in analyser_processes:
             process.start()
+
+        for process in analyser_processes:
             process.join()
 
     def get_outbound_data_senders(self) -> dict[str, SmSender]:

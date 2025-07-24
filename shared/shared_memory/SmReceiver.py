@@ -10,6 +10,8 @@ T = TypeVar('T')
 class SmReceiver(Generic[T]):
 
     def __init__(self, sender: 'SmSender', clazz: type['SmSender']):
+        if sender is None:
+            raise ValueError(f"No sender found for {clazz.__name__}")
         self.sender: T = sender.as_type(sender,clazz)
         self.sender.register_receiver(self)
 

@@ -44,7 +44,6 @@ class AudioProvider(IngestBase, CommandLineArgumentAdder, GracefulKiller):
             channels=self.channels,
             rate=self.sample_rate,
             input=True,
-            output=False,
             frames_per_buffer=self.chunk_size,
             input_device_index=self.device_index,
             stream_callback=self.write_audio_to_memory,
@@ -64,7 +63,7 @@ class AudioProvider(IngestBase, CommandLineArgumentAdder, GracefulKiller):
             return int(math.floor(sample_rate))
 
     def detect_chunk_size(self) -> int:
-        return int(math.floor(self.sample_rate * (1 / 6)))
+        return int(math.floor(self.sample_rate / 10))
 
     def run(self):
         self.stream.start_stream()

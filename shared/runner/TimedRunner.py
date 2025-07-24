@@ -52,7 +52,7 @@ class TimedRunner(Runner, TimingReceiver):
                 self.adjust_complexity(True)
                 time_taken = time.time() - start_time
                 if self.statistics_are_active:
-                    self.write_statistics(time_taken)
+                    self.write_statistics_time(time_taken)
                 await asyncio.sleep(max_time-time_taken)
             except asyncio.TimeoutError:
                 logging.warning(

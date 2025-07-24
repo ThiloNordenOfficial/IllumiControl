@@ -6,7 +6,6 @@ from typing import TextIO
 
 from shared.CommandLineArgumentAdder import CommandLineArgumentAdder
 from shared import GracefulKiller
-from shared.validators.is_valid_file import is_valid_file
 
 
 class StatisticWriter(GracefulKiller, CommandLineArgumentAdder):
@@ -30,11 +29,17 @@ class StatisticWriter(GracefulKiller, CommandLineArgumentAdder):
             os.remove(file_path)
         return open(file_path, 'x')
 
-    def write_statistics(self, time_taken: float):
+    def write_statistics_time(self, time_taken: float):
         if self.statistics_are_active:
             time_taken_trimmed = "{:.6f}".format(time_taken)
             self._file_handle.write(f"{datetime.now()}, {time_taken_trimmed}\n",)
             self._file_handle.flush()
+
+    def write_statistics(self, message):
+        if self.statistics_are_active:
+            self._file_handle.write(f"{message},\n")
+            self._file_handle.flush()
+
 
     @staticmethod
     def add_command_line_arguments(parser: argparse) -> argparse:
