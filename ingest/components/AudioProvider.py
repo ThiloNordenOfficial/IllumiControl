@@ -64,7 +64,7 @@ class AudioProvider(IngestBase, CommandLineArgumentAdder, GracefulKiller):
             return int(math.floor(sample_rate))
 
     def detect_chunk_size(self) -> int:
-        return int(math.floor(self.sample_rate))
+        return int(math.floor(self.sample_rate * (1 / 6)))
 
     def run(self):
         self.stream.start_stream()
