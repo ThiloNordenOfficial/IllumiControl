@@ -1,8 +1,6 @@
 import argparse
-import logging
 
 import numpy as np
-from torchaudio.functional import loudness
 
 from generate import GeneratorBase
 from shared.CommandLineArgumentAdder import CommandLineArgumentAdder
@@ -34,12 +32,15 @@ class RGBGenerator(GeneratorBase, CommandLineArgumentAdder):
             sender.close()
 
     async def run_procedure(self):
-        loudness_min = 0
+        loudness_baseline = 15
         loudness_max = 100
         loudness = self.loudness_receiver.read_on_update()[0][0]
-        t = np.clip((loudness - loudness_min) / (loudness_max - loudness_min), 0.0, 1.0)
-        low = int(t * 255)
-        self.rgb_data_sender.update(np.random.randint(low, 256, size=self.shape, dtype=np.uint8))
+        t = np.clip((loudness - loudness_baseline) / (loudness_max - loudness_baseline), 0.0, 1.0)
+        min_brightness = int(t * 255)
+        max_brightness = int((1 - t) * 255)
+        if max_brightness <= min_brightness:
+            max_brightness = 255
+        self.rgb_data_sender.update(np.random.randint(min_brightness, max_brightness, size=self.shape, dtype=np.uint8))
 
     def get_outbound_data_senders(self) -> dict[str, SmSender]:
         return self.outbound_data_senders
