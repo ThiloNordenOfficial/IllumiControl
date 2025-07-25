@@ -1,8 +1,10 @@
+import logging
 from abc import abstractmethod
 
 from shared.fixture.DmxSignal import DmxSignal
 from shared.fixture.FixtureSignal import FixtureSignal
 from shared.runner.PostTimeRunner import PostTimeRunner
+from shared.shared_memory import SmSender
 
 
 def is_list_of_type(obj, typ):
@@ -10,6 +12,8 @@ def is_list_of_type(obj, typ):
 
 
 class PostProcessorBase(PostTimeRunner):
+    def __init__(self, data_senders: dict[str, SmSender]):
+        PostTimeRunner.__init__(self, data_senders)
 
     async def run_after_processing(self, *args, **kwargs):
         if not (isinstance(args[0], list) and all(isinstance(x, FixtureSignal) for x in args[0])):
