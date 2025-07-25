@@ -1,14 +1,10 @@
 from postprocess.PostProcessorBase import PostProcessorBase
 from shared.fixture.DmxSignal import DmxSignal
 from shared.fixture.FixtureSignal import FixtureSignal
-from shared.shared_memory import SmSender
 
 
 class PassThroughProcessor(PostProcessorBase):
-    def __init__(self, data_senders: dict[str, SmSender]):
-        PostProcessorBase.__init__(self, data_senders)
-
-    async def run_after(self, fixture_signals: list[FixtureSignal], dmx_signals: list[DmxSignal]) -> list[
+    def run_after(self, fixture_signals: list[FixtureSignal], dmx_signals: list[DmxSignal]) -> list[
         DmxSignal]:
         universe_map = {}
 

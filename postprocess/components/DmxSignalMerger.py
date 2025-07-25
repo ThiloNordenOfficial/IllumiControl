@@ -1,13 +1,9 @@
 from postprocess.PostProcessorBase import PostProcessorBase
 from shared.fixture import FixtureSignal, DmxSignal
-from shared.shared_memory import SmSender
 
 
 class DmxSignalMerger(PostProcessorBase):
-    def __init__(self, data_senders: dict[str, SmSender]):
-        PostProcessorBase.__init__(self, data_senders)
-
-    async def run_after(self, fixture_signals: list[FixtureSignal], dmx_signals: list[DmxSignal]) -> list[
+    def run_after(self, fixture_signals: list[FixtureSignal], dmx_signals: list[DmxSignal]) -> list[
         DmxSignal]:
         universe_map = {}
         for dmx_signal in dmx_signals:

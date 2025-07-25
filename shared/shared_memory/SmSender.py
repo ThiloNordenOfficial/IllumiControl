@@ -2,7 +2,6 @@ import logging
 from abc import abstractmethod
 from typing import final, TypeVar, Generic, TYPE_CHECKING, Type, cast
 
-
 T = TypeVar('T')
 S = TypeVar('S', bound='SmSender')
 
@@ -18,13 +17,9 @@ class SmSender(Generic[T]):
     def close(self):
         pass
 
-    abstractmethod(close)
-
     @abstractmethod
     def update(self, new_data: T):
         pass
-
-    abstractmethod(update)
 
     @staticmethod
     def as_type(sender: object, clazz: Type[S]) -> S:

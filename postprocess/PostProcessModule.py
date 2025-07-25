@@ -6,13 +6,15 @@ from postprocess.PostProcessorBase import PostProcessorBase
 from shared import DataSender, GracefulKiller
 from shared.fixture.DmxSignal import DmxSignal
 from shared.fixture.FixtureSignal import FixtureSignal
+from shared.runner import PostTimeRunner
 from shared.shared_memory import SmSender, QueueReceiver, NumpyArraySender, QueueSender
 
 
-class PostProcessModule(GracefulKiller, DataSender):
+class PostProcessModule(PostTimeRunner, GracefulKiller, DataSender):
 
     def __init__(self, data_senders: dict[str, SmSender]):
         DataSender.__init__(self)
+        PostTimeRunner.__init__(self, data_senders)
         self.fixture_signal_queue = QueueReceiver[FixtureSignal](data_senders.get('fixture_signal_queue'))
         self.dmx_queue_sender = QueueSender[DmxSignal]("/dmx_queue")
         self.post_processing_finished_sender = NumpyArraySender(np.shape([1]))
@@ -20,8 +22,6 @@ class PostProcessModule(GracefulKiller, DataSender):
 
     def delete(self):
         logging.info("Deleting post processors")
-        for postprocessor in self.post_processors:
-            postprocessor.delete()
         self.post_processing_finished_sender.close()
         self.fixture_signal_queue.close()
         self.dmx_queue_sender.close()
@@ -33,18 +33,18 @@ class PostProcessModule(GracefulKiller, DataSender):
             postprocessor.append(postprocessor_class(data_senders))
         return postprocessor
 
-    def run(self):
-        logging.debug("Starting post processor run loop")
+    async def run_after_processing(self, *args, **kwargs):
         while not self.kill_event.is_set():
             fixture_signals = self.fixture_signal_queue.get_all_present()
             if fixture_signals:
                 dmx_signals = []
                 for postprocessor in self.post_processors:
-                    dmx_signals = postprocessor.run(fixture_signals, dmx_signals)
+                    dmx_signals = postprocessor.run_after_processing(fixture_signals, dmx_signals)
                 for dmx_signal in dmx_signals:
                     self.dmx_queue_sender.update(dmx_signal)
                 self.post_processing_finished_sender.update(np.array([1]))
         self.delete()
+
 
     def get_outbound_data_senders(self) -> dict[str, SmSender]:
         return {
