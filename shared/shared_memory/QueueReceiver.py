@@ -23,5 +23,5 @@ class QueueReceiver[T](SmReceiver[T]):
     def get_all_present(self)-> list[T]:
         signals = []
         while self.queue.qsize() != 0:
-            signals.append(self.queue.get_nowait())
+            signals.append(self.queue.get(False))
         return signals
