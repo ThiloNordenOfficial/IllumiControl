@@ -9,11 +9,13 @@ from shared.shared_memory.NumpyArrayReceiver import NumpyArrayReceiver
 
 class RGBExtractor(ExtractorBase):
     def __init__(self, data_senders):
-        super().__init__(data_senders)
+        ExtractorBase.__init__(self,data_senders)
         self.rgb_data_receiver = NumpyArrayReceiver(data_senders.get("RGB-image"))
-        self.relevant_fixtures = [fixture for fixture in self.fixtures if fixture.dmx_addresses[1] == ct.COLOR_RED or
-                                  ct.COLOR_GREEN or
-                                  ct.COLOR_BLUE]
+
+    def get_relevant_fixtures(self):
+        return [fixture for fixture in self.fixtures if fixture.dmx_addresses[1] == ct.COLOR_RED or
+         ct.COLOR_GREEN or
+         ct.COLOR_BLUE]
 
     async def run_procedure(self):
         rbg_data = self.rgb_data_receiver.read_on_update()
