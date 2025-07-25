@@ -5,12 +5,16 @@ from shared.fixture.FixtureSignal import FixtureSignal
 from shared.runner.PostTimeRunner import PostTimeRunner
 
 
+def is_list_of_type(obj, typ):
+    return isinstance(obj, list) and all(isinstance(item, typ) for item in obj)
+
+
 class PostProcessorBase(PostTimeRunner):
 
     async def run_after_processing(self, *args, **kwargs):
-        if not args or not isinstance(args[0], list):
+        if not (isinstance(args[0], list) and all(isinstance(x, FixtureSignal) for x in args[0])):
             raise ValueError("No fixture signals provided")
-        if not args or not isinstance(args[1], list):
+        if not (isinstance(args[1], list) and all(isinstance(x, DmxSignal) for x in args[1])):
             raise ValueError("No DMX signals provided")
         fixture_signals: list[FixtureSignal] = args[0]
         dmx_signals: list[DmxSignal] = args[1]
