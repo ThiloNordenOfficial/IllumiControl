@@ -13,13 +13,14 @@ class ExtractModule(FixtureConsumer, DataSender):
     def __init__(self, data_senders: dict[str, SmSender]):
         logging.info("Initializing feature extractor")
         FixtureConsumer.__init__(self)
-        self.fixture_signal_queue_sender = QueueSender[FixtureSignal]("fixture_signal")
+        self.fixture_signal_queue_sender = QueueSender[FixtureSignal]("/fixture_signal_queue")
+        data_senders.update({"fixture_signal_queue": self.fixture_signal_queue_sender})
         self.extractors = self._instantiate_extractors(data_senders)
 
     def _instantiate_extractors(self, data_senders) -> list[ExtractorBase]:
         extractors = []
         for extractor_class in ExtractorBase.__subclasses__():
-            extractors.append(extractor_class(data_senders, self.fixtures, self.fixture_signal_queue_sender))
+            extractors.append(extractor_class(data_senders))
         return extractors
 
     def run(self):

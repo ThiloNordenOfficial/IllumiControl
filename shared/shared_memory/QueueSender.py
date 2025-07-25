@@ -13,7 +13,7 @@ class QueueSender[T](SmSender[T]):
 
     def __init__(self, name: str, maxsize: int = 10, maxmsgsize: int = 1024):
         super().__init__()
-        self.name = f"/{name}_queue"
+        self.name = name
         self.maxsize = maxsize
         self.maxmsgsize = maxmsgsize
         if self.name not in QueueSender._queues:

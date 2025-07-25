@@ -14,7 +14,7 @@ class PostProcessModule(GracefulKiller, DataSender):
     def __init__(self, data_senders: dict[str, SmSender]):
         DataSender.__init__(self)
         self.fixture_signal_queue = QueueReceiver[FixtureSignal](data_senders.get('fixture_signal_queue'))
-        self.dmx_queue_sender = QueueSender[DmxSignal]("dmx")
+        self.dmx_queue_sender = QueueSender[DmxSignal]("/dmx_queue")
         self.post_processing_finished_sender = NumpyArraySender(np.shape([1]))
         self.post_processors = self._instantiate_post_processors(data_senders)
 
