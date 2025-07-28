@@ -13,7 +13,7 @@ class SenderBase(PostTimeRunner):
         self.post_processor_finished_receiver = NumpyArrayReceiver(data_senders.get("post_processing_finished"))
 
     async def run_after_processing(self, *args, **kwargs):
-        if not args or not isinstance(args[0], list):
+        if not args or not isinstance(args[0], list) or not all(isinstance(x, DmxSignal) for x in args[0]):
             raise ValueError("No DMX values provided")
         dmx_values = args[0]
         return await self.run_after(dmx_values)

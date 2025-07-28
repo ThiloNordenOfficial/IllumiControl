@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import time
 
 from send.SenderBase import SenderBase
 from shared.fixture.DmxSignal import DmxSignal
@@ -31,6 +32,7 @@ class SendModule(Runner):
 
     async def run_procedure (self):
         self.post_processing_finished_receiver.read_on_update()
+        self.start_time= time.time()
         dmx_values = self.dmx_value_queue.get_all_present()
         threads = []
         for sender in self.senders:

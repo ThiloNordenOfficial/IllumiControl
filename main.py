@@ -86,6 +86,7 @@ class IllumiControl:
                         sender_runner]
         for runner in self.runners:
             runner.start()
+        logging.warning("Startup of IllumiControl completed, all runners started")
 
     def join_runners(self):
         for runner in self.runners:

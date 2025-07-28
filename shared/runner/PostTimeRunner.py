@@ -18,12 +18,10 @@ class PostTimeRunner(TimingReceiver, StatisticWriter):
 
     @final
     async def _run(self, *args, **kwargs):
-        await asyncio.sleep(float(self.timing_receiver.read_on_update()[0]))
         start_time = time.time()
         return_value = await self.run_after_processing(*args, **kwargs)
         time_taken = time.time() - start_time
-        if self.statistics_are_active:
-            self.write_statistics_time(time_taken)
+        self.write_statistics_time(time_taken)
         return return_value
 
     @abstractmethod
