@@ -26,6 +26,7 @@ class PostProcessModule(Runner, TimingReceiver, DataSender, StatisticWriter):
 
     def delete(self):
         logging.info("Deleting post processors")
+        self.post_processing_finished_sender.update(np.array([1]))
         self.post_processing_finished_sender.close()
         self.fixture_signal_queue.close()
         self.dmx_queue_sender.close()
