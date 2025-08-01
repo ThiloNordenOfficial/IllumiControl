@@ -32,12 +32,6 @@ class TimedRunner(Runner, TimingReceiver):
             self._times_without_complexity_adjustment = 0
             logging.debug(f"Decreased complexity of {self.__class__.__name__} to {self.complexity}")
 
-    @abstractmethod
-    async def run_procedure(self):
-        pass
-
-    abstractmethod(run_procedure)
-
     @final
     def run(self):
         asyncio.run(self._run_until_shutdown())
@@ -52,10 +46,14 @@ class TimedRunner(Runner, TimingReceiver):
                 self.adjust_complexity(True)
                 time_taken = time.time() - start_time
                 self.write_statistics_time(time_taken)
-                await asyncio.sleep(max_time-time_taken)
+                await asyncio.sleep(max_time - time_taken)
             except asyncio.TimeoutError:
                 logging.warning(
                     F"Dropped {self.__class__.__name__} step due to not finishing in time ({max_time}s), will adjust complexity")
                 self.adjust_complexity(False)
 
         self.delete()
+
+    @abstractmethod
+    async def run_procedure(self):
+        pass
