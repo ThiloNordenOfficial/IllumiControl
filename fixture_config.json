@@ -4,19 +4,23 @@
       "id": 0,
       "fixtures": [
         {
-          "id": 0,
+          "id": 1,
           "type": "PAR",
           "dmx_addresses": [
             {
-              "channel": 5,
-              "channel_type": "COLOR_RED"
-            },
-            {
               "channel": 6,
-              "channel_type": "COLOR_GREEN"
+              "channel_type": "CONTROL_DIMMER"
             },
             {
               "channel": 7,
+              "channel_type": "COLOR_RED"
+            },
+            {
+              "channel": 8,
+              "channel_type": "COLOR_GREEN"
+            },
+            {
+              "channel": 9,
               "channel_type": "COLOR_BLUE"
             }
           ],
@@ -24,29 +28,6 @@
             0,
             0,
             0
-          ]
-        },
-        {
-          "id": 1,
-          "type": "PAR",
-          "dmx_addresses": [
-            {
-              "channel": 21,
-              "channel_type": "COLOR_RED"
-            },
-            {
-              "channel": 22,
-              "channel_type": "COLOR_GREEN"
-            },
-            {
-              "channel": 23,
-              "channel_type": "COLOR_BLUE"
-            }
-          ],
-          "position": [
-            2,
-            3,
-            4
           ]
         }
       ]

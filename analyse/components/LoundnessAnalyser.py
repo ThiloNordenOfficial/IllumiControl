@@ -19,7 +19,7 @@ class LoudnessAnalyser(AnalyserBase):
 
 
     async def run_procedure(self):
-        data = self.raw_audio_data_receiver.read_last(8000) # last half second
+        data = self.raw_audio_data_receiver.read_last(1000) # last eight of a second
         rms = np.sqrt(np.mean(data.astype(np.float32) ** 2))
         loudness_db = 20 * np.log10(rms)
         self.loudness_sender.update(np.array([[loudness_db]]))

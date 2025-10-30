@@ -1,4 +1,5 @@
 import argparse
+import logging
 
 import numpy as np
 
@@ -15,7 +16,7 @@ class RGBGenerator(GeneratorBase, CommandLineArgumentAdder):
     depth = None
 
     def __init__(self, data_senders):
-        GeneratorBase.__init__(self,data_senders)
+        GeneratorBase.__init__(self, data_senders)
         CommandLineArgumentAdder.__init__(self)
 
         self.shape = (self.height, self.width, self.depth, 3)
@@ -32,13 +33,14 @@ class RGBGenerator(GeneratorBase, CommandLineArgumentAdder):
             sender.close()
 
     async def run_procedure(self):
+        #autocalibrated in the future
         loudness_baseline = 15
-        loudness_max = 100
+        loudness_max = 54
         loudness = self.loudness_receiver.read_on_update()[0][0]
         t = np.clip((loudness - loudness_baseline) / (loudness_max - loudness_baseline), 0.0, 1.0)
         min_brightness = int(t * 255)
-        max_brightness = int((1 - t) * 255)
-        if max_brightness <= min_brightness:
+        max_brightness = min_brightness+1
+        if max_brightness < min_brightness:
             max_brightness = 255
         self.rgb_data_sender.update(np.random.randint(min_brightness, max_brightness, size=self.shape, dtype=np.uint8))
 

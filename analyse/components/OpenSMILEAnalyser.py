@@ -57,13 +57,13 @@ class OpenSmileAnalyser(TimingProviderBase, CommandLineArgumentAdder):
         self.audio_data_sender.update(audio_data)
 
     def digest(self) -> np.ndarray:
-        value = self.raw_audio_data_receiver.read_last(AudioProvider.sample_rate*4)
-        signal = self.smile.process_signal(
-            value.astype(np.float32),
-            AudioProvider.sample_rate
-        ).to_numpy()
+        #value = self.raw_audio_data_receiver.read_last(AudioProvider.sample_rate*4)
+        #signal = self.smile.process_signal(
+        #    value.astype(np.float32),
+        #    AudioProvider.sample_rate
+        #).to_numpy()
         self.timing_sender.update(np.array([1 / self.fps]))
-        return signal
+        return np.zeros([1,self.smile.num_features])
 
     def delete(self):
         self.raw_audio_data_receiver.close()
