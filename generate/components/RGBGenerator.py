@@ -14,6 +14,8 @@ class RGBGenerator(GeneratorBase, CommandLineArgumentAdder):
     height = None
     width = None
     depth = None
+    loudness_threshold= None
+    max_loudness = None
 
     def __init__(self, data_senders):
         GeneratorBase.__init__(self, data_senders)
@@ -33,13 +35,11 @@ class RGBGenerator(GeneratorBase, CommandLineArgumentAdder):
             sender.close()
 
     async def run_procedure(self):
-        #autocalibrated in the future
-        loudness_baseline = 15
-        loudness_max = 54
         loudness = self.loudness_receiver.read_on_update()[0][0]
-        t = np.clip((loudness - loudness_baseline) / (loudness_max - loudness_baseline), 0.0, 1.0)
+        t = np.clip((loudness - self.loudness_threshold) / (self.max_loudness - self.loudness_threshold), 0.0, 1.0)
         min_brightness = int(t * 255)
-        max_brightness = min_brightness+1
+        max_brightness = min_brightness + 1
+        logging.debug(f"t: {t}, min: {min_brightness}")
         if max_brightness < min_brightness:
             max_brightness = 255
         self.rgb_data_sender.update(np.random.randint(min_brightness, max_brightness, size=self.shape, dtype=np.uint8))
@@ -53,6 +53,8 @@ class RGBGenerator(GeneratorBase, CommandLineArgumentAdder):
         parser.add_argument("--height", dest='height', type=int, default=10,
                             help="Height of the image in pixels")
         parser.add_argument("--depth", dest='depth', type=int, default=10, help="Depth of the image in pixels")
+        parser.add_argument("--loudness-threshold", dest='loudness_threshold', type=float)
+        parser.add_argument("--max-loudness", dest='max_loudness', type=float)
 
     add_command_line_arguments = staticmethod(add_command_line_arguments)
 
@@ -61,3 +63,6 @@ class RGBGenerator(GeneratorBase, CommandLineArgumentAdder):
         cls.height = args.height
         cls.width = args.width
         cls.depth = args.depth
+        cls.loudness_threshold = args.loudness_threshold
+        cls.max_loudness = args.max_loudness
+        logging.error(f"{args}")

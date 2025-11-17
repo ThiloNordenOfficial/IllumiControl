@@ -19,7 +19,8 @@ class StatisticWriter(GracefulKiller, CommandLineArgumentAdder):
             self._file_handle: TextIO = self._setup_statistics()
 
     def delete(self):
-        self._file_handle.close()
+        if self.statistics_are_active:
+            self._file_handle.close()
 
     def _setup_statistics(self):
         os.makedirs(self.path, exist_ok=True)
