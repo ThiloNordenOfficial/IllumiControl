@@ -1,3 +1,6 @@
 /statistics
 .$diagramm*
 /.idea/
+/.proxyai/
+*.wav
+*.mp3
