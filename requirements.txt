@@ -4,3 +4,7 @@ pyaudio~=0.2.13
 opensmile~=2.5.1
 stupidArtnet~=1.5.0
 ipcqueue~=0.9.7
+demucs_infer~=4.1.2
+diffq
+torch
+spleeter

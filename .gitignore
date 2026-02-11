@@ -4,3 +4,5 @@
 /.proxyai/
 *.wav*
 *.mp3*
+/source-separation-experiments/output/
+/source-separation-experiments/input/
