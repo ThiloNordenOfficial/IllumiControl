@@ -1,1 +1,2 @@
-from .RGBExtractor import RGBExtractor
+# from .RGBExtractor import RGBExtractor
+from .PerlinExtractor import PerlinExtractor
