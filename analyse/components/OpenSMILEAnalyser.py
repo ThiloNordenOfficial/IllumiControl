@@ -7,7 +7,6 @@ import opensmile
 from opensmile import FeatureLevel
 
 from analyse.TimingProviderBase import TimingProviderBase
-from ingest import AudioProvider
 from shared.CommandLineArgumentAdder import CommandLineArgumentAdder
 from shared.shared_memory.ByteReceiver import ByteReceiver
 from shared.shared_memory.NumpyArraySender import NumpyArraySender

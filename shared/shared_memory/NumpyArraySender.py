@@ -4,6 +4,22 @@ from multiprocessing import shared_memory, Condition
 from shared.shared_memory.SmSender import SmSender
 
 
+def safe_create_shared_memory(name, size) -> shared_memory.SharedMemory:
+    try:
+        # Try to create new shared memory
+        return shared_memory.SharedMemory(create=True, size=size, name=name)
+    except FileExistsError:
+        # If it exists, try to unlink it first
+        try:
+            existing_shm = shared_memory.SharedMemory(name=name)
+            existing_shm.unlink()
+            existing_shm.close()
+        except:
+            pass
+        # Now try to create again
+        return shared_memory.SharedMemory(create=True, size=size, name=name)
+
+
 class NumpyArraySender(SmSender[np.ndarray]):
     """
     DataSender creates a shared memory block where a NumPy array along with a version number
@@ -20,7 +36,8 @@ class NumpyArraySender(SmSender[np.ndarray]):
         self.total_size = 8 + self.data_nbytes
 
         # Create the shared memory block
-        self.shm = shared_memory.SharedMemory(create=True, size=self.total_size, name=shm_name)
+        self.shm = safe_create_shared_memory(size=self.total_size, name=shm_name)
+
         self.name = self.shm.name
         # Create a NumPy view for the version number (first 8 bytes, as int64)
         self.version_array = np.ndarray((1,), dtype=np.int64, buffer=self.shm.buf[:8])
@@ -47,8 +64,3 @@ class NumpyArraySender(SmSender[np.ndarray]):
             self.version_array[0] += 1
             # Notify all waiting receivers
             self.condition.notify_all()
-
-    def close(self):
-        self.shm.close()
-        self.shm.unlink()
-        del self.shm

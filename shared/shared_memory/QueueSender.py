@@ -1,5 +1,7 @@
 import logging
-from typing import TypeVar
+import pickle
+import sys
+from typing import TypeVar, overload
 
 from ipcqueue.posixmq import Queue
 
@@ -16,14 +18,13 @@ class QueueSender[T](SmSender[T]):
         self.maxmsgsize = maxmsgsize
         self.queue = Queue(self.name, maxsize=maxsize, maxmsgsize=maxmsgsize)
 
-
     def close(self):
         self.queue.close()
         self.queue.unlink()
 
-    def update(self, new_data: T):
-        if self.queue.qsize() >= self.maxsize:
-            logging.warning(f"QueueSender: Queue {self.name} is full, dropping oldest data")
-            self.queue.get_nowait()
-        self.queue.put(new_data)
-
+    def update(self, new_data: T | list[T]) -> None:
+        if isinstance(new_data, list):
+            for itm in new_data:
+                self.queue.put(itm)
+        else:
+            self.queue.put(new_data)

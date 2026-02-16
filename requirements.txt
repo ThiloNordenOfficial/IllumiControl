@@ -1,10 +1,8 @@
 numpy~=1.26.4
 coloredlogs~=15.0.1
 pyaudio~=0.2.13
-opensmile~=2.5.1
 stupidArtnet~=1.5.0
 ipcqueue~=0.9.7
 demucs_infer~=4.1.2
-diffq
-torch
-spleeter
+openunmix
+torch~=2.7.1

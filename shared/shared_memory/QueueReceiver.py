@@ -7,6 +7,7 @@ from shared.shared_memory.QueueSender import QueueSender
 
 T = TypeVar('T')
 
+
 class QueueReceiver[T](SmReceiver[T]):
     def __init__(self, sender: SmSender):
         super().__init__(sender, QueueSender[T])
@@ -20,7 +21,7 @@ class QueueReceiver[T](SmReceiver[T]):
     def get(self) -> T:
         return self.queue.get()
 
-    def get_all_present(self)-> list[T]:
+    def get_all_present(self) -> list[T]:
         signals = []
         while self.queue.qsize() != 0:
             signals.append(self.queue.get(False))

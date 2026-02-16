@@ -12,6 +12,7 @@ def callback(in_data: bytes | None, frame_count: int, time_info: Mapping[str, fl
     np_audio = np.frombuffer(in_data, dtype=np.float32)
     tensor_audio = torch.tensor(np_audio, dtype=torch.float32)
     umx_audio = openunmix.utils.preprocess(tensor_audio, sample_rate, separator.sample_rate)
+    print(separator.sample_rate)
     audio = umx_audio.to('cuda')
 
     start_time = time.time()
@@ -29,6 +30,7 @@ if __name__ == '__main__':
     model = openunmix.umxhq
     #model = openunmix.umxl
     separator = model(device='cuda', pretrained=True, wiener_win_len=None, niter=1)
+    print(separator)
 
     stem = {
         "vocals": 0,
@@ -37,7 +39,6 @@ if __name__ == '__main__':
         "other": 3
     }
     replay_stem = stem['vocals']
-
     p = pyaudio.PyAudio()
     sample_rate = 44100
     stream = p.open(
