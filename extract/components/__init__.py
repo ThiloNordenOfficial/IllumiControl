@@ -1,2 +1,4 @@
 # from .RGBExtractor import RGBExtractor
-from .PerlinExtractor import PerlinExtractor
+from .BassPerlinExtractor import BassPerlinExtractor
+from .DrumsPerlinExtractor import DrumsPerlinExtractor
+from .VocalsPerlinExtractor import VocalsPerlinExtractor

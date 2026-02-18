@@ -33,10 +33,10 @@ def separate(path: str):
 
 if __name__ == '__main__':
     input_dir = '../input/'
-    output_dir = '../output/demucs-mdx-extra-q/'
+    output_dir = '../output/demucs-mdx-q/'
     file_type = '.wav'
 
-    model = get_model("mdx_extra_q")
+    model = get_model("mdx_q")
     # model = get_model("htdemucs")
     model.eval()
 

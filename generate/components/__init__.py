@@ -1,2 +1,4 @@
 # from .RGBGenerator import RGBGenerator
-from .PerlinGenerator import PerlinGenerator
+from .VocalsPerlinGenerator import VocalsPerlinGenerator
+from .BassPerlinGenerator import BassPerlinGenerator
+from .DrumsPerlinGenerator import DrumsPerlinGenerator

@@ -6,6 +6,13 @@ from numpy import ndarray
 from shared.shared_memory.SmSender import SmSender, T
 
 
+def get_or_create_shared_memory(name, size) -> shared_memory.SharedMemory:
+    try:
+        return shared_memory.SharedMemory(size=size, name=name)
+    except FileNotFoundError:
+        return shared_memory.SharedMemory(create=True, size=size, name=name)
+
+
 class ByteSender(SmSender[bytes]):
     def __init__(self, size, shm_name=None, dtype=np.int16):
         super().__init__()
@@ -13,7 +20,7 @@ class ByteSender(SmSender[bytes]):
         self.lock = manager.Lock()
         self.size = size
         self.dtype = dtype
-        self.shm = shared_memory.SharedMemory(size=size, name=shm_name)
+        self.shm = get_or_create_shared_memory(shm_name, size)
         self.buffer = self.shm.buf
         self.write_index = Value('i', 0)  # Shared memory index for writing
 

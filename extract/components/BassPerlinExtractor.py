@@ -9,19 +9,20 @@ from shared.fixture.FixtureSignal import FixtureSignal
 from shared.shared_memory.NumpyArrayReceiver import NumpyArrayReceiver
 
 
-class PerlinExtractor(ExtractorBase):
+class BassPerlinExtractor(ExtractorBase):
     def __init__(self, data_senders):
         ExtractorBase.__init__(self, data_senders)
+        self.rgb_receiver = NumpyArrayReceiver(data_senders.get("bass_rgb_image"))
 
     def get_relevant_fixtures(self):
-        return []
+        return [self.fixtures[0]]
 
     async def run_procedure(self):
-        rbg_data = np.ndarray((1,1,1))
+        rbg_data = self.rgb_receiver.read_on_update()
         fixture_values = []
         for fixture in self.relevant_fixtures:
             channel_values = []
-            rgb_values = rbg_data[fixture.position[0], fixture.position[1], fixture.position[2]]
+            rgb_values = rbg_data[fixture.position[0], fixture.position[1]]
             for dmx_address in fixture.dmx_addresses:
                 if dmx_address[1] == ct.COLOR_RED:
                     channel_values.append(
@@ -36,5 +37,5 @@ class PerlinExtractor(ExtractorBase):
                     channel_values.append(ChannelValue(dmx_address[0], 254))
 
             fixture_values.append((fixture, channel_values))
-            logging.debug(f"RGB Extractor setting Signal for fixture: {fixture.fixture_id}")
+            logging.debug(f"RGB Bass value setting Signal for fixture: {fixture.fixture_id}")
             self.fixture_signal_queue_sender.update(FixtureSignal(self.__class__.__name__, fixture, channel_values))

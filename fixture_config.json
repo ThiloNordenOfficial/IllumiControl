@@ -29,6 +29,60 @@
             0,
             0
           ]
+        },
+        {
+          "id": 2,
+          "type": "PAR",
+          "dmx_addresses": [
+            {
+              "channel": 11,
+              "channel_type": "CONTROL_DIMMER"
+            },
+            {
+              "channel": 12,
+              "channel_type": "COLOR_RED"
+            },
+            {
+              "channel": 13,
+              "channel_type": "COLOR_GREEN"
+            },
+            {
+              "channel": 14,
+              "channel_type": "COLOR_BLUE"
+            }
+          ],
+          "position": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "id": 3,
+          "type": "PAR",
+          "dmx_addresses": [
+            {
+              "channel": 16,
+              "channel_type": "CONTROL_DIMMER"
+            },
+            {
+              "channel": 17,
+              "channel_type": "COLOR_RED"
+            },
+            {
+              "channel": 18,
+              "channel_type": "COLOR_GREEN"
+            },
+            {
+              "channel": 19,
+              "channel_type": "COLOR_BLUE"
+            }
+          ],
+          "position": [
+            0,
+            0,
+            0
+          ]
         }
       ]
     }
