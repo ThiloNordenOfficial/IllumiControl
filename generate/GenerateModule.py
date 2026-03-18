@@ -16,6 +16,7 @@ class GenerateModule(DataSender):
     def _instantiate_generators(self, data_senders) -> list[GeneratorBase]:
         generators = []
         for generator_class in GeneratorBase.__subclasses__():
+            print(generator_class)
             generators.append(generator_class(data_senders))
         return generators
 

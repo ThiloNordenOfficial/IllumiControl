@@ -28,11 +28,11 @@ def separate(path: str):
 
 if __name__ == '__main__':
     input_dir = '../input/'
-    output_dir = '../output/scnet-large/'
+    output_dir = '../output/scnet/'
     file_type = '.wav'
 
     config_path = 'scnetlib/conf/config.yaml'
-    checkpoint_path = 'scnetlib/checkpoints/SCNet-large.th'
+    checkpoint_path = 'scnetlib/checkpoints/checkpoint.th'
 
     with open(config_path, 'r') as file:
         config = ConfigDict(yaml.load(file, Loader=yaml.FullLoader))

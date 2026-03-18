@@ -35,10 +35,10 @@ class StemLoudnessAnalyser(TimingProviderBase):
             stem_audio = receiver.read_last(self.samples_per_frame)
             if len(stem_audio) <= 1:
                 continue
-            track_rms = librosa.feature.rms(y=stem_audio, center=False).mean()
+            track_rms = librosa.feature.rms(y=stem_audio, center=False).mean() * 1000
             # TODO worauf basiert librosa die rms?
-            logging.debug(f"RMS for {name}: {track_rms*1000}")
-            self.data_senders[f"stem_loudness_{name}"].update(np.asarray([track_rms*1000]))
+            logging.debug(f"RMS for {name}: {track_rms}")
+            self.data_senders[f"stem_loudness_{name}"].update(np.asarray([track_rms]))
         await asyncio.sleep(1 / self.fps)
         self.timing_sender.update(np.array([1 / self.fps]))
 

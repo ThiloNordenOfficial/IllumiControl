@@ -8,19 +8,19 @@
           "type": "PAR",
           "dmx_addresses": [
             {
-              "channel": 6,
+              "channel": 90,
               "channel_type": "CONTROL_DIMMER"
             },
             {
-              "channel": 7,
+              "channel": 91,
               "channel_type": "COLOR_RED"
             },
             {
-              "channel": 8,
+              "channel": 92,
               "channel_type": "COLOR_GREEN"
             },
             {
-              "channel": 9,
+              "channel": 93,
               "channel_type": "COLOR_BLUE"
             }
           ],
@@ -35,46 +35,19 @@
           "type": "PAR",
           "dmx_addresses": [
             {
-              "channel": 11,
+              "channel": 70,
               "channel_type": "CONTROL_DIMMER"
             },
             {
-              "channel": 12,
+              "channel": 71,
               "channel_type": "COLOR_RED"
             },
             {
-              "channel": 13,
+              "channel": 72,
               "channel_type": "COLOR_GREEN"
             },
             {
-              "channel": 14,
-              "channel_type": "COLOR_BLUE"
-            }
-          ],
-          "position": [
-            0,
-            0,
-            0
-          ]
-        },
-        {
-          "id": 3,
-          "type": "PAR",
-          "dmx_addresses": [
-            {
-              "channel": 16,
-              "channel_type": "CONTROL_DIMMER"
-            },
-            {
-              "channel": 17,
-              "channel_type": "COLOR_RED"
-            },
-            {
-              "channel": 18,
-              "channel_type": "COLOR_GREEN"
-            },
-            {
-              "channel": 19,
+              "channel": 73,
               "channel_type": "COLOR_BLUE"
             }
           ],

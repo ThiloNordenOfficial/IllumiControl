@@ -1,12 +1,13 @@
 import argparse
+import time
 
-import numpy as np
 import noise
+import numpy as np
+from PIL import Image
 
 from generate import GeneratorBase
 from shared import CommandLineArgumentAdder
 from shared.shared_memory import SmSender, NumpyArrayReceiver, NumpyArraySender
-from PIL import Image
 
 
 class VocalsPerlinGenerator(GeneratorBase, CommandLineArgumentAdder):
@@ -31,6 +32,7 @@ class VocalsPerlinGenerator(GeneratorBase, CommandLineArgumentAdder):
 
     async def run_procedure(self):
         loudness = self.vocal_loudness_receiver.read_on_update()[0]
+        self.start_time = time.time()
         loudness_scale = loudness if loudness > 10 else 0
         scale = 250
         self.x_offset = self.x_offset + self.movement_speed * 3 + (self.movement_speed * loudness_scale * 7)
@@ -68,9 +70,9 @@ class VocalsPerlinGenerator(GeneratorBase, CommandLineArgumentAdder):
 
         rgb_array = np.stack([red_noise, green_noise, blue_noise], axis=-1)
         self.rgb_image.update(rgb_array)
-        # img = Image.fromarray(rgb_array, 'RGB')
-        # img.save(f"simplex-noise/vocals/{self.n}.png")
-        # self.n = self.n + 1
+        #img = Image.fromarray(rgb_array, 'RGB')
+        #img.save(f"simplex-noise/vocals/{self.n}.png")
+        #self.n = self.n + 1
 
     def get_outbound_data_senders(self) -> dict[str, SmSender]:
         return self.outbound_data_senders

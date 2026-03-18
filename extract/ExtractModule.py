@@ -20,6 +20,7 @@ class ExtractModule(FixtureConsumer, DataSender):
     def _instantiate_extractors(self, data_senders) -> list[ExtractorBase]:
         extractors = []
         for extractor_class in ExtractorBase.__subclasses__():
+            print(extractor_class)
             extractors.append(extractor_class(data_senders))
         return extractors
 

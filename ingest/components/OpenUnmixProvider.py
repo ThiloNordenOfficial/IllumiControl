@@ -26,7 +26,6 @@ class OpenUnmixProvider(IngestBase, CommandLineArgumentAdder, GracefulKiller):
     sample_rate = None
     chunk_size = None
     channels = None
-    audio_buffer_size = None
 
     def __init__(self):
         if self.list_audio_devices is not None:
@@ -56,14 +55,26 @@ class OpenUnmixProvider(IngestBase, CommandLineArgumentAdder, GracefulKiller):
             output_device_index=self.device_index,
             frames_per_buffer=self.chunk_size,
             input_device_index=self.device_index,
-            stream_callback=self.analyse_audio,
+            stream_callback=self.analyse_audio
         )
+        self.raw_audio_data_sender = ByteSender(
+            self.chunk_size * self.sample_rate * self.channels * 4,
+            shm_name="raw_audio_input",
+            dtype=np.float32
+        )
+
         self.stem_names = self.separator.target_models.keys()
 
         self.data_senders: dict[str, SmSender] = {
-            f"separated_audio_{name}": ByteSender(size=4 * 8192,
-                                                  shm_name=f"separated_audio_{name}", dtype=np.float32)
-            for name in self.stem_names
+            "raw_audio_input": self.raw_audio_data_sender,
+            **{
+                f"separated_audio_{name}": ByteSender(
+                    size=4 * 8192,
+                    shm_name=f"separated_audio_{name}",
+                    dtype=np.float32
+                )
+                for name in self.stem_names
+            }
         }
 
     def delete(self):
@@ -79,9 +90,11 @@ class OpenUnmixProvider(IngestBase, CommandLineArgumentAdder, GracefulKiller):
     def analyse_audio(self, in_data: bytes | None, frame_count: int, time_info: Mapping[str, float],
                       status: int) -> \
             tuple[bytes | None, int] | None:
+        self.raw_audio_data_sender.update(in_data)
+
         np_audio = np.frombuffer(in_data, dtype=np.float32)
         tensor_audio = torch.tensor(np_audio, dtype=torch.float32)
-        umx_audio = openunmix.utils.preprocess(tensor_audio, self.sample_rate, self.sample_rate)
+        umx_audio = openunmix.utils.preprocess(tensor_audio, self.sample_rate, 44100)
         audio = umx_audio.to(self.device)
 
         stems = self.separator(audio)

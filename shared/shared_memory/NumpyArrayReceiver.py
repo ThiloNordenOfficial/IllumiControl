@@ -42,6 +42,12 @@ class NumpyArrayReceiver(SmReceiver[NumpyArraySender]):
 
         return self.data_array
 
+    def read_last(self) -> np.ndarray:
+        """
+        Returns the most recently updated array without blocking.
+        """
+        return self.data_array
+
     def close(self):
         """
         Closes the shared memory connection.
